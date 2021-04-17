@@ -111,6 +111,8 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     this.style = options.style;
     this.hoverStyle = options.hoverStyle;
     this.resources = options.resources;
+    
+    PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false
 
     if (!(this.container instanceof HTMLElement)) {
       throw new Error('container should be a HTMLElement');
