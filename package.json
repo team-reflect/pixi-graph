@@ -25,11 +25,12 @@
     "deepmerge": "^4.2.2",
     "events": "^3.2.0",
     "pixi-viewport": "^4.15.0",
-    "tiny-typed-emitter": "^2.0.3"
+    "tiny-typed-emitter": "^2.0.3",
+    "tslib": "^2.2.0"
   },
   "peerDependencies": {
-    "pixi.js": "^5.3.3",
-    "graphology-types": "^0.19.2"
+    "graphology-types": "^0.19.2",
+    "pixi.js": "^5.3.3"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^15.1.0",
