@@ -1,5 +1,5 @@
 {
-  "name": "pixi-graph",
+  "name": "@team-reflect/pixi-graph",
   "version": "1.2.1",
   "description": "Graph visualization library using PIXI.js and Graphology",
   "keywords": [
