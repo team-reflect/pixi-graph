@@ -50,6 +50,7 @@ export interface GraphOptions<NodeAttributes extends BaseNodeAttributes = BaseNo
   style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   resources?: ResourceLoader.IAddOptions[];
+  nodeDragging?: boolean;
 }
 
 interface PixiGraphEvents {
@@ -73,6 +74,7 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
   style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   resources?: ResourceLoader.IAddOptions[];
+  nodeDragging: boolean;
 
   private app: PIXI.Application;
   private textureCache: TextureCache;
@@ -111,6 +113,7 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     this.style = options.style;
     this.hoverStyle = options.hoverStyle;
     this.resources = options.resources;
+    this.nodeDragging = typeof options.nodeDragging === 'boolean' ? options.nodeDragging : true;
     
     PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false
 
@@ -402,7 +405,6 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     this.viewport.pause = true; // disable viewport dragging
 
     document.addEventListener('mousemove', this.onDocumentMouseMoveBound);
-    document.addEventListener('mouseup', this.onDocumentMouseUpBound, { once: true });
   }
 
   private onDocumentMouseMove(event: MouseEvent) {
@@ -447,7 +449,12 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     });
     node.on('mousedown', (event: MouseEvent) => {
       this.mousedownNodeKey = nodeKey;
-      this.enableNodeDragging();
+
+      if (this.nodeDragging) {
+        this.enableNodeDragging();
+      }
+
+      document.addEventListener('mouseup', this.onDocumentMouseUpBound, { once: true });
       this.emit('nodeMousedown', event, nodeKey);
     });
     node.on('mouseup', (event: MouseEvent) => {

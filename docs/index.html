@@ -40,6 +40,7 @@
     <button id="update-edges">Update Edges</button>
     <button id="export">Export</button>
     <button id="import">Import</button>
+    <button id="toggle-node-dragging">Disable Node Dragging</button>
     <div style="height: 10px"></div>
     <button id="zoom-in">Zoom In</button>
     <button id="zoom-out">Zoom Out</button>
@@ -271,6 +272,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     graph.import(serializedGraph);
   };
   document.getElementById('import').addEventListener('click', importGraph);
+
+  const toggleNodeDraggingButton = document.getElementById('toggle-node-dragging')
+  let nodeDragging = true
+
+  const toggleNodeDragging = () => {
+    pixiGraph.nodeDragging = !nodeDragging;
+    toggleNodeDraggingButton.innerText = nodeDragging ? 'Enable Node Dragging' : 'Disable Node Dragging';
+    nodeDragging = !nodeDragging;
+  };
+
+  toggleNodeDraggingButton.addEventListener('click', toggleNodeDragging)
 });
 </script>
 
