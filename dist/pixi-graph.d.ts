@@ -67,6 +67,7 @@ interface GraphOptions<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
     hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
     resources?: ResourceLoader.IAddOptions[];
+    nodeDragging?: boolean;
 }
 interface PixiGraphEvents {
     nodeClick: (event: MouseEvent, nodeKey: string) => void;
@@ -88,6 +89,7 @@ declare class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttr
     style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
     hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
     resources?: ResourceLoader.IAddOptions[];
+    nodeDragging: boolean;
     private app;
     private textureCache;
     private viewport;

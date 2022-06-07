@@ -424,6 +424,7 @@ var PixiGraph = /** @class */ (function (_super) {
         _this.style = options.style;
         _this.hoverStyle = options.hoverStyle;
         _this.resources = options.resources;
+        _this.nodeDragging = typeof options.nodeDragging === 'boolean' ? options.nodeDragging : true;
         PIXI__namespace.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
         if (!(_this.container instanceof HTMLElement)) {
             throw new Error('container should be a HTMLElement');
@@ -671,7 +672,6 @@ var PixiGraph = /** @class */ (function (_super) {
     PixiGraph.prototype.enableNodeDragging = function () {
         this.viewport.pause = true; // disable viewport dragging
         document.addEventListener('mousemove', this.onDocumentMouseMoveBound);
-        document.addEventListener('mouseup', this.onDocumentMouseUpBound, { once: true });
     };
     PixiGraph.prototype.onDocumentMouseMove = function (event) {
         var eventPosition = new PIXI__namespace.Point(event.offsetX, event.offsetY);
@@ -710,7 +710,10 @@ var PixiGraph = /** @class */ (function (_super) {
         });
         node.on('mousedown', function (event) {
             _this.mousedownNodeKey = nodeKey;
-            _this.enableNodeDragging();
+            if (_this.nodeDragging) {
+                _this.enableNodeDragging();
+            }
+            document.addEventListener('mouseup', _this.onDocumentMouseUpBound, { once: true });
             _this.emit('nodeMousedown', event, nodeKey);
         });
         node.on('mouseup', function (event) {

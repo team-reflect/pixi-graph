@@ -164,6 +164,7 @@ export interface GraphOptions<NodeAttributes extends BaseNodeAttributes = BaseNo
   style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   resources?: ResourceLoader.IAddOptions[];
+  nodeDragging?: boolean;
 }
 
 export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes, EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes> {
@@ -179,6 +180,7 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
 - `resources` - [resource-loader](https://github.com/englercj/resource-loader) external resource definitions
   - resources are passed to loader.add function
   - currently used only for external bitmap fonts
+- `nodeDragging` - Determines whether nodes can be dragged. It's enabled by default.
 
 ### Style definition
 
