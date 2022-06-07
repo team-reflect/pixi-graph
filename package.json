@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "author": "Jan Zak <zj@zakjan.cz>",
-  "repository": "github:zakjan/pixi-graph",
+  "repository": "github:team-reflect/pixi-graph",
   "main": "dist/pixi-graph.cjs.js",
   "module": "dist/pixi-graph.esm.js",
   "browser": "dist/pixi-graph.umd.min.js",
