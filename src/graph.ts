@@ -432,7 +432,12 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
 
   private createNode(nodeKey: string, nodeAttributes: NodeAttributes) {
     const node = new PixiNode();
+    let mouseMoved = false
     node.on('mousemove', (event: MouseEvent) => {
+      if (this.mousedownNodeKey === nodeKey) {
+        mouseMoved = true
+      }
+    
       this.emit('nodeMousemove', event, nodeKey);
     });
     node.on('mouseover', (event: MouseEvent) => {
@@ -448,6 +453,7 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
       this.emit('nodeMouseout', event, nodeKey);
     });
     node.on('mousedown', (event: MouseEvent) => {
+      mouseMoved = false
       this.mousedownNodeKey = nodeKey;
 
       if (this.nodeDragging) {
@@ -460,7 +466,7 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     node.on('mouseup', (event: MouseEvent) => {
       this.emit('nodeMouseup', event, nodeKey);
       // why native click event doesn't work?
-      if (this.mousedownNodeKey === nodeKey) {
+      if (this.mousedownNodeKey === nodeKey && !mouseMoved) {
         this.emit('nodeClick', event, nodeKey);
       }
     });
