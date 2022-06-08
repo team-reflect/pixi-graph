@@ -1,6 +1,5 @@
-import * as Graphology from 'graphology-types';
-import { Attributes } from 'graphology-types';
-import * as ResourceLoader from 'resource-loader';
+import { Attributes, AbstractGraph } from 'graphology-types';
+import { IAddOptions } from 'resource-loader';
 import { TypedEmitter } from 'tiny-typed-emitter';
 
 declare enum TextType {
@@ -63,10 +62,10 @@ interface GraphStyleDefinition<NodeAttributes extends BaseNodeAttributes = BaseN
 
 interface GraphOptions<NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes, EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes> {
     container: HTMLElement;
-    graph: Graphology.AbstractGraph<NodeAttributes, EdgeAttributes>;
+    graph: AbstractGraph<NodeAttributes, EdgeAttributes>;
     style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
     hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
-    resources?: ResourceLoader.IAddOptions[];
+    resources?: IAddOptions[];
     nodeDragging?: boolean;
 }
 interface PixiGraphEvents {
@@ -85,10 +84,10 @@ interface PixiGraphEvents {
 }
 declare class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes, EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes> extends TypedEmitter<PixiGraphEvents> {
     container: HTMLElement;
-    graph: Graphology.AbstractGraph<NodeAttributes, EdgeAttributes>;
+    graph: AbstractGraph<NodeAttributes, EdgeAttributes>;
     style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
     hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
-    resources?: ResourceLoader.IAddOptions[];
+    resources?: IAddOptions[];
     nodeDragging: boolean;
     private app;
     private textureCache;

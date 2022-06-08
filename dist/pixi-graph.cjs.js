@@ -12,32 +12,10 @@ var rgba = require('color-rgba');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
-function _interopNamespace(e) {
-  if (e && e.__esModule) return e;
-  var n = Object.create(null);
-  if (e) {
-    Object.keys(e).forEach(function (k) {
-      if (k !== 'default') {
-        var d = Object.getOwnPropertyDescriptor(e, k);
-        Object.defineProperty(n, k, d.get ? d : {
-          enumerable: true,
-          get: function () {
-            return e[k];
-          }
-        });
-      }
-    });
-  }
-  n['default'] = e;
-  return Object.freeze(n);
-}
-
-var PIXI__namespace = /*#__PURE__*/_interopNamespace(PIXI);
 var deepmerge__default = /*#__PURE__*/_interopDefaultLegacy(deepmerge);
 var rgba__default = /*#__PURE__*/_interopDefaultLegacy(rgba);
 
-var WHITE$1 = 0xffffff;
-exports.TextType = void 0;
+var WHITE = 0xffffff;
 (function (TextType) {
     TextType["TEXT"] = "TEXT";
     TextType["BITMAP_TEXT"] = "BITMAP_TEXT";
@@ -48,14 +26,14 @@ function textToPixi(type, content, style) {
     var text;
     if (type === exports.TextType.TEXT) {
         // TODO: convert to bitmap font with PIXI.BitmapFont.from?
-        text = new PIXI__namespace.Text(content, {
+        text = new PIXI.Text(content, {
             fontFamily: style.fontFamily,
             fontSize: style.fontSize,
-            fill: WHITE$1
+            fill: WHITE
         });
     }
     else if (type === exports.TextType.BITMAP_TEXT) {
-        text = new PIXI__namespace.BitmapText(content, {
+        text = new PIXI.BitmapText(content, {
             fontName: style.fontFamily,
             fontSize: style.fontSize
         });
@@ -99,8 +77,8 @@ var TextureCache = /** @class */ (function () {
         if (!texture) {
             var container = defaultCallback();
             var region = container.getLocalBounds(undefined, true);
-            var roundedRegion = new PIXI__namespace.Rectangle(Math.floor(region.x), Math.floor(region.y), Math.ceil(region.width), Math.ceil(region.height));
-            texture = this.app.renderer.generateTexture(container, PIXI__namespace.SCALE_MODES.LINEAR, this.app.renderer.resolution, roundedRegion);
+            var roundedRegion = new PIXI.Rectangle(Math.floor(region.x), Math.floor(region.y), Math.ceil(region.width), Math.ceil(region.height));
+            texture = this.app.renderer.generateTexture(container, PIXI.SCALE_MODES.LINEAR, this.app.renderer.resolution, roundedRegion);
             this.textures.set(key, texture);
         }
         return texture;
@@ -130,31 +108,31 @@ function colorToPixi(color) {
     if (!rgbaColor) {
         throw new Error("Invalid color " + color);
     }
-    var pixiColor = PIXI__namespace.utils.rgb2hex([rgbaColor[0] / 255, rgbaColor[1] / 255, rgbaColor[2] / 255]);
+    var pixiColor = PIXI.utils.rgb2hex([rgbaColor[0] / 255, rgbaColor[1] / 255, rgbaColor[2] / 255]);
     var alpha = rgbaColor[3];
     return [pixiColor, alpha];
 }
 
-var DELIMETER$1 = '::';
-var WHITE = 0xffffff;
+var DELIMETER = '::';
+var WHITE$1 = 0xffffff;
 var NODE_CIRCLE = 'NODE_CIRCLE';
 var NODE_CIRCLE_BORDER = 'NODE_CIRCLE_BORDER';
 var NODE_ICON = 'NODE_ICON';
 function createNode(nodeGfx) {
     // nodeGfx
-    nodeGfx.hitArea = new PIXI__namespace.Circle(0, 0);
+    nodeGfx.hitArea = new PIXI.Circle(0, 0);
     // nodeGfx -> nodeCircle
-    var nodeCircle = new PIXI__namespace.Sprite();
+    var nodeCircle = new PIXI.Sprite();
     nodeCircle.name = NODE_CIRCLE;
     nodeCircle.anchor.set(0.5);
     nodeGfx.addChild(nodeCircle);
     // nodeGfx -> nodeCircleBorder
-    var nodeCircleBorder = new PIXI__namespace.Sprite();
+    var nodeCircleBorder = new PIXI.Sprite();
     nodeCircleBorder.name = NODE_CIRCLE_BORDER;
     nodeCircleBorder.anchor.set(0.5);
     nodeGfx.addChild(nodeCircleBorder);
     // nodeGfx -> nodeIcon
-    var nodeIcon = new PIXI__namespace.Sprite();
+    var nodeIcon = new PIXI.Sprite();
     nodeIcon.name = NODE_ICON;
     nodeIcon.anchor.set(0.5);
     nodeGfx.addChild(nodeIcon);
@@ -162,21 +140,21 @@ function createNode(nodeGfx) {
 function updateNodeStyle(nodeGfx, nodeStyle, textureCache) {
     var _a, _b, _c;
     var nodeOuterSize = nodeStyle.size + nodeStyle.border.width;
-    var nodeCircleTextureKey = [NODE_CIRCLE, nodeStyle.size].join(DELIMETER$1);
+    var nodeCircleTextureKey = [NODE_CIRCLE, nodeStyle.size].join(DELIMETER);
     var nodeCircleTexture = textureCache.get(nodeCircleTextureKey, function () {
-        var graphics = new PIXI__namespace.Graphics();
-        graphics.beginFill(WHITE);
+        var graphics = new PIXI.Graphics();
+        graphics.beginFill(WHITE$1);
         graphics.drawCircle(nodeStyle.size, nodeStyle.size, nodeStyle.size);
         return graphics;
     });
-    var nodeCircleBorderTextureKey = [NODE_CIRCLE_BORDER, nodeStyle.size, nodeStyle.border.width].join(DELIMETER$1);
+    var nodeCircleBorderTextureKey = [NODE_CIRCLE_BORDER, nodeStyle.size, nodeStyle.border.width].join(DELIMETER);
     var nodeCircleBorderTexture = textureCache.get(nodeCircleBorderTextureKey, function () {
-        var graphics = new PIXI__namespace.Graphics();
-        graphics.lineStyle(nodeStyle.border.width, WHITE);
+        var graphics = new PIXI.Graphics();
+        graphics.lineStyle(nodeStyle.border.width, WHITE$1);
         graphics.drawCircle(nodeOuterSize, nodeOuterSize, nodeStyle.size);
         return graphics;
     });
-    var nodeIconTextureKey = [NODE_ICON, nodeStyle.icon.fontFamily, nodeStyle.icon.fontSize, nodeStyle.icon.content].join(DELIMETER$1);
+    var nodeIconTextureKey = [NODE_ICON, nodeStyle.icon.fontFamily, nodeStyle.icon.fontSize, nodeStyle.icon.content].join(DELIMETER);
     var nodeIconTexture = textureCache.get(nodeIconTextureKey, function () {
         var text = textToPixi(nodeStyle.icon.type, nodeStyle.icon.content, {
             fontFamily: nodeStyle.icon.fontFamily,
@@ -209,17 +187,17 @@ function updateNodeVisibility(nodeGfx, zoomStep) {
     nodeIcon.visible = nodeIcon.visible && zoomStep >= 2;
 }
 
-var DELIMETER = '::';
+var DELIMETER$1 = '::';
 var NODE_LABEL_BACKGROUND = 'NODE_LABEL_BACKGROUND';
 var NODE_LABEL_TEXT = 'NODE_LABEL_TEXT';
 function createNodeLabel(nodeLabelGfx) {
     // nodeLabelGfx -> nodeLabelBackground
-    var nodeLabelBackground = new PIXI__namespace.Sprite(PIXI__namespace.Texture.WHITE);
+    var nodeLabelBackground = new PIXI.Sprite(PIXI.Texture.WHITE);
     nodeLabelBackground.name = NODE_LABEL_BACKGROUND;
     nodeLabelBackground.anchor.set(0.5);
     nodeLabelGfx.addChild(nodeLabelBackground);
     // nodeLabelGfx -> nodeLabelText
-    var nodeLabelText = new PIXI__namespace.Sprite();
+    var nodeLabelText = new PIXI.Sprite();
     nodeLabelText.name = NODE_LABEL_TEXT;
     nodeLabelText.anchor.set(0.5);
     nodeLabelGfx.addChild(nodeLabelText);
@@ -227,7 +205,7 @@ function createNodeLabel(nodeLabelGfx) {
 function updateNodeLabelStyle(nodeLabelGfx, nodeStyle, textureCache) {
     var _a, _b;
     var nodeOuterSize = nodeStyle.size + nodeStyle.border.width;
-    var nodeLabelTextTextureKey = [NODE_LABEL_TEXT, nodeStyle.label.fontFamily, nodeStyle.label.fontSize, nodeStyle.label.content].join(DELIMETER);
+    var nodeLabelTextTextureKey = [NODE_LABEL_TEXT, nodeStyle.label.fontFamily, nodeStyle.label.fontSize, nodeStyle.label.content].join(DELIMETER$1);
     var nodeLabelTextTexture = textureCache.get(nodeLabelTextTextureKey, function () {
         var text = textToPixi(nodeStyle.label.type, nodeStyle.label.content, {
             fontFamily: nodeStyle.label.fontFamily,
@@ -263,13 +241,13 @@ var PixiNode = /** @class */ (function (_super) {
         _this.hovered = false;
         _this.nodeGfx = _this.createNode();
         _this.nodeLabelGfx = _this.createNodeLabel();
-        _this.nodePlaceholderGfx = new PIXI__namespace.Container();
-        _this.nodeLabelPlaceholderGfx = new PIXI__namespace.Container();
+        _this.nodePlaceholderGfx = new PIXI.Container();
+        _this.nodeLabelPlaceholderGfx = new PIXI.Container();
         return _this;
     }
     PixiNode.prototype.createNode = function () {
         var _this = this;
-        var nodeGfx = new PIXI__namespace.Container();
+        var nodeGfx = new PIXI.Container();
         nodeGfx.interactive = true;
         nodeGfx.buttonMode = true;
         nodeGfx.on('mousemove', function (event) { return _this.emit('mousemove', event.data.originalEvent); });
@@ -282,7 +260,7 @@ var PixiNode = /** @class */ (function (_super) {
     };
     PixiNode.prototype.createNodeLabel = function () {
         var _this = this;
-        var nodeLabelGfx = new PIXI__namespace.Container();
+        var nodeLabelGfx = new PIXI.Container();
         nodeLabelGfx.interactive = true;
         nodeLabelGfx.buttonMode = true;
         nodeLabelGfx.on('mousemove', function (event) { return _this.emit('mousemove', event.data.originalEvent); });
@@ -311,7 +289,7 @@ var PixiNode = /** @class */ (function (_super) {
 var EDGE_LINE = 'EDGE_LINE';
 function createEdge(edgeGfx) {
     // edgeGfx -> edgeLine
-    var edgeLine = new PIXI__namespace.Sprite(PIXI__namespace.Texture.WHITE);
+    var edgeLine = new PIXI.Sprite(PIXI.Texture.WHITE);
     edgeLine.name = EDGE_LINE;
     edgeLine.anchor.set(0.5);
     edgeGfx.addChild(edgeLine);
@@ -335,12 +313,12 @@ var PixiEdge = /** @class */ (function (_super) {
         var _this = _super.call(this) || this;
         _this.hovered = false;
         _this.edgeGfx = _this.createEdge();
-        _this.edgePlaceholderGfx = new PIXI__namespace.Container();
+        _this.edgePlaceholderGfx = new PIXI.Container();
         return _this;
     }
     PixiEdge.prototype.createEdge = function () {
         var _this = this;
-        var edgeGfx = new PIXI__namespace.Container();
+        var edgeGfx = new PIXI.Container();
         edgeGfx.interactive = true;
         edgeGfx.buttonMode = true;
         edgeGfx.on('mousemove', function (event) { return _this.emit('mousemove', event.data.originalEvent); });
@@ -425,12 +403,12 @@ var PixiGraph = /** @class */ (function (_super) {
         _this.hoverStyle = options.hoverStyle;
         _this.resources = options.resources;
         _this.nodeDragging = typeof options.nodeDragging === 'boolean' ? options.nodeDragging : true;
-        PIXI__namespace.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
+        PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
         if (!(_this.container instanceof HTMLElement)) {
             throw new Error('container should be a HTMLElement');
         }
         // create PIXI application
-        _this.app = new PIXI__namespace.Application({
+        _this.app = new PIXI.Application({
             resizeTo: _this.container,
             resolution: window.devicePixelRatio,
             transparent: true,
@@ -454,12 +432,12 @@ var PixiGraph = /** @class */ (function (_super) {
             .clampZoom({ maxScale: 1 });
         _this.app.stage.addChild(_this.viewport);
         // create layers
-        _this.edgeLayer = new PIXI__namespace.Container();
-        _this.frontEdgeLayer = new PIXI__namespace.Container();
-        _this.nodeLayer = new PIXI__namespace.Container();
-        _this.nodeLabelLayer = new PIXI__namespace.Container();
-        _this.frontNodeLayer = new PIXI__namespace.Container();
-        _this.frontNodeLabelLayer = new PIXI__namespace.Container();
+        _this.edgeLayer = new PIXI.Container();
+        _this.frontEdgeLayer = new PIXI.Container();
+        _this.nodeLayer = new PIXI.Container();
+        _this.nodeLabelLayer = new PIXI.Container();
+        _this.frontNodeLayer = new PIXI.Container();
+        _this.frontNodeLabelLayer = new PIXI.Container();
         _this.viewport.addChild(_this.edgeLayer);
         _this.viewport.addChild(_this.frontEdgeLayer);
         _this.viewport.addChild(_this.nodeLayer);
@@ -541,7 +519,7 @@ var PixiGraph = /** @class */ (function (_super) {
         var maxY = Math.max.apply(Math, nodesY);
         var graphWidth = Math.abs(maxX - minX);
         var graphHeight = Math.abs(maxY - minY);
-        var graphCenter = new PIXI__namespace.Point(minX + graphWidth / 2, minY + graphHeight / 2);
+        var graphCenter = new PIXI.Point(minX + graphWidth / 2, minY + graphHeight / 2);
         var worldWidth = graphWidth + WORLD_PADDING * 2;
         var worldHeight = graphHeight + WORLD_PADDING * 2;
         // TODO: update worldWidth/worldHeight when graph is updated?
@@ -674,7 +652,7 @@ var PixiGraph = /** @class */ (function (_super) {
         document.addEventListener('mousemove', this.onDocumentMouseMoveBound);
     };
     PixiGraph.prototype.onDocumentMouseMove = function (event) {
-        var eventPosition = new PIXI__namespace.Point(event.offsetX, event.offsetY);
+        var eventPosition = new PIXI.Point(event.offsetX, event.offsetY);
         var worldPosition = this.viewport.toWorld(eventPosition);
         if (this.mousedownNodeKey) {
             this.moveNode(this.mousedownNodeKey, worldPosition);
@@ -693,7 +671,11 @@ var PixiGraph = /** @class */ (function (_super) {
     PixiGraph.prototype.createNode = function (nodeKey, nodeAttributes) {
         var _this = this;
         var node = new PixiNode();
+        var mouseMoved = false;
         node.on('mousemove', function (event) {
+            if (_this.mousedownNodeKey === nodeKey) {
+                mouseMoved = true;
+            }
             _this.emit('nodeMousemove', event, nodeKey);
         });
         node.on('mouseover', function (event) {
@@ -709,6 +691,7 @@ var PixiGraph = /** @class */ (function (_super) {
             _this.emit('nodeMouseout', event, nodeKey);
         });
         node.on('mousedown', function (event) {
+            mouseMoved = false;
             _this.mousedownNodeKey = nodeKey;
             if (_this.nodeDragging) {
                 _this.enableNodeDragging();
@@ -719,7 +702,7 @@ var PixiGraph = /** @class */ (function (_super) {
         node.on('mouseup', function (event) {
             _this.emit('nodeMouseup', event, nodeKey);
             // why native click event doesn't work?
-            if (_this.mousedownNodeKey === nodeKey) {
+            if (_this.mousedownNodeKey === nodeKey && !mouseMoved) {
                 _this.emit('nodeClick', event, nodeKey);
             }
         });

@@ -26,8 +26,7 @@
 
   var PIXI__namespace = /*#__PURE__*/_interopNamespace(PIXI);
 
-  var WHITE$1 = 0xffffff;
-  exports.TextType = void 0;
+  var WHITE = 0xffffff;
   (function (TextType) {
       TextType["TEXT"] = "TEXT";
       TextType["BITMAP_TEXT"] = "BITMAP_TEXT";
@@ -38,14 +37,14 @@
       var text;
       if (type === exports.TextType.TEXT) {
           // TODO: convert to bitmap font with PIXI.BitmapFont.from?
-          text = new PIXI__namespace.Text(content, {
+          text = new PIXI.Text(content, {
               fontFamily: style.fontFamily,
               fontSize: style.fontSize,
-              fill: WHITE$1
+              fill: WHITE
           });
       }
       else if (type === exports.TextType.BITMAP_TEXT) {
-          text = new PIXI__namespace.BitmapText(content, {
+          text = new PIXI.BitmapText(content, {
               fontName: style.fontFamily,
               fontSize: style.fontSize
           });
@@ -57,7 +56,7 @@
       return text;
   }
 
-  /*! *****************************************************************************
+  /******************************************************************************
   Copyright (c) Microsoft Corporation.
 
   Permission to use, copy, modify, and/or distribute this software for any
@@ -176,15 +175,6 @@
       }
 
       /**
-       * clears all pointer events
-       */
-      clear() {
-          this.isMouseDown = false;
-          this.touches = [];
-          this.last = null;
-      }
-
-      /**
        * @param {number} change
        * @returns whether change exceeds threshold
        */
@@ -271,11 +261,6 @@
        */
       handleWheel(event) {
           if (this.viewport.pause || !this.viewport.worldVisible) {
-              return
-          }
-
-          // do not handle events coming from other elements
-          if (this.viewport.options.interaction && this.viewport.options.interaction.interactionDOMElement !== event.target) {
               return
           }
 
@@ -370,7 +355,7 @@
        */
       get(name, ignorePaused) {
           if (ignorePaused) {
-              if (this.plugins[name] && this.plugins[name].paused) {
+              if (typeof this.plugins[name] !== 'undefined' && this.plugins[name].paused) {
                   return null
               }
           }
@@ -407,19 +392,13 @@
           }
       }
 
-      /** removes all installed plugins */
-      removeAll() {
-          this.plugins = {};
-          this.sort();
-      }
-
       /**
        * removes installed plugin
        * @param {string} name of plugin (e.g., 'drag', 'pinch')
        */
       remove(name) {
           if (this.plugins[name]) {
-              delete this.plugins[name];
+              this.plugins[name] = null;
               this.viewport.emit(name + '-remove');
               this.sort();
           }
@@ -526,11 +505,13 @@
   /**
    * derive this class to create user-defined plugins
    */
-  class Plugin {
+  class Plugin
+  {
       /**
        * @param {Viewport} parent
        */
-      constructor(parent) {
+      constructor(parent)
+      {
           this.parent = parent;
           this.paused = false;
       }
@@ -543,7 +524,8 @@
        * @param {PIXI.InteractionEvent} event
        * @returns {boolean}
        */
-      down() {
+      down()
+      {
           return false
       }
 
@@ -552,7 +534,8 @@
        * @param {PIXI.InteractionEvent} event
        * @returns {boolean}
        */
-      move() {
+      move()
+      {
           return false
       }
 
@@ -561,7 +544,8 @@
        * @param {PIXI.InteractionEvent} event
        * @returns {boolean}
        */
-      up() {
+      up()
+      {
           return false
       }
 
@@ -570,7 +554,8 @@
        * @param {WheelEvent} event
        * @returns {boolean}
        */
-      wheel() {
+      wheel()
+      {
           return false
       }
 
@@ -587,12 +572,14 @@
       reset() { }
 
       /** pause the plugin */
-      pause() {
+      pause()
+      {
           this.paused = true;
       }
 
       /** un-pause the plugin */
-      resume() {
+      resume()
+      {
           this.paused = false;
       }
   }
@@ -617,7 +604,6 @@
    * @property {string} [mouseButtons=all] changes which mouse buttons trigger drag, use: 'all', 'left', right' 'middle', or some combination, like, 'middle-right'; you may want to set viewport.options.disableOnContextMenu if you want to use right-click dragging
    * @property {string[]} [keyToPress=null] array containing {@link key|https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code} codes of keys that can be pressed for the drag to be triggered, e.g.: ['ShiftLeft', 'ShiftRight'}.
    * @property {boolean} [ignoreKeyToPressOnTouch=false] ignore keyToPress for touch events
-   * @property {number} [lineHeight=20] scaling factor for non-DOM_DELTA_PIXEL scrolling events
    */
 
   const dragOptions = {
@@ -631,8 +617,7 @@
       factor: 1,
       mouseButtons: 'all',
       keyToPress: null,
-      ignoreKeyToPressOnTouch: false,
-      lineHeight: 20,
+      ignoreKeyToPressOnTouch: false
   };
 
   /**
@@ -664,12 +649,12 @@
        * @param {array} codes - key codes that can be used to trigger drag event
        */
       handleKeyPresses(codes) {
-          window.addEventListener('keydown', e => {
+          parent.addEventListener("keydown", e => {
               if (codes.includes(e.code))
                   this.keyIsPressed = true;
           });
 
-          window.addEventListener('keyup', e => {
+          parent.addEventListener("keyup", e => {
               if (codes.includes(e.code))
                   this.keyIsPressed = false;
           });
@@ -682,7 +667,8 @@
       mouseButtons(buttons) {
           if (!buttons || buttons === 'all') {
               this.mouse = [true, true, true];
-          } else {
+          }
+          else {
               this.mouse = [
                   buttons.indexOf('left') === -1 ? false : true,
                   buttons.indexOf('middle') === -1 ? false : true,
@@ -696,7 +682,8 @@
           if (clamp === 'center') {
               this.underflowX = 0;
               this.underflowY = 0;
-          } else {
+          }
+          else {
               this.underflowX = (clamp.indexOf('left') !== -1) ? -1 : (clamp.indexOf('right') !== -1) ? 1 : 0;
               this.underflowY = (clamp.indexOf('top') !== -1) ? -1 : (clamp.indexOf('bottom') !== -1) ? 1 : 0;
           }
@@ -739,7 +726,8 @@
               this.last = { x: event.data.global.x, y: event.data.global.y };
               this.current = event.data.pointerId;
               return true
-          } else {
+          }
+          else {
               this.last = null;
           }
       }
@@ -778,7 +766,8 @@
                       this.parent.emit('moved', { viewport: this.parent, type: 'drag' });
                       return true
                   }
-              } else {
+              }
+              else {
                   this.moved = false;
               }
           }
@@ -801,7 +790,8 @@
               }
               this.moved = false;
               return true
-          } else if (this.last) {
+          }
+          else if (this.last) {
               if (this.moved) {
                   const screen = new PIXI.Point(this.last.x, this.last.y);
                   this.parent.emit('drag-end', { event: event, screen, world: this.parent.toWorld(screen), viewport: this.parent });
@@ -824,12 +814,11 @@
           if (this.options.wheel) {
               const wheel = this.parent.plugins.get('wheel', true);
               if (!wheel) {
-                  const step = event.deltaMode ? this.options.lineHeight : 1;
                   if (this.xDirection) {
-                      this.parent.x += event.deltaX * step * this.options.wheelScroll * this.reverse;
+                      this.parent.x += event.deltaX * this.options.wheelScroll * this.reverse;
                   }
                   if (this.yDirection) {
-                      this.parent.y += event.deltaY * step * this.options.wheelScroll * this.reverse;
+                      this.parent.y += event.deltaY * this.options.wheelScroll * this.reverse;
                   }
                   if (this.options.clampWheel) {
                       this.clamp();
@@ -854,20 +843,22 @@
           if (this.options.clampWheel !== 'y') {
               if (this.parent.screenWorldWidth < this.parent.screenWidth) {
                   switch (this.underflowX) {
-                  case -1:
-                      this.parent.x = 0;
-                      break
-                  case 1:
-                      this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth);
-                      break
-                  default:
-                      this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
+                      case -1:
+                          this.parent.x = 0;
+                          break
+                      case 1:
+                          this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth);
+                          break
+                      default:
+                          this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
                   }
-              } else {
+              }
+              else {
                   if (this.parent.left < 0) {
                       this.parent.x = 0;
                       decelerate.x = 0;
-                  } else if (this.parent.right > this.parent.worldWidth) {
+                  }
+                  else if (this.parent.right > this.parent.worldWidth) {
                       this.parent.x = -this.parent.worldWidth * this.parent.scale.x + this.parent.screenWidth;
                       decelerate.x = 0;
                   }
@@ -876,16 +867,17 @@
           if (this.options.clampWheel !== 'x') {
               if (this.parent.screenWorldHeight < this.parent.screenHeight) {
                   switch (this.underflowY) {
-                  case -1:
-                      this.parent.y = 0;
-                      break
-                  case 1:
-                      this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight);
-                      break
-                  default:
-                      this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
+                      case -1:
+                          this.parent.y = 0;
+                          break
+                      case 1:
+                          this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight);
+                          break
+                      default:
+                          this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
                   }
-              } else {
+              }
+              else {
                   if (this.parent.top < 0) {
                       this.parent.y = 0;
                       decelerate.y = 0;
@@ -902,18 +894,14 @@
   /**
    * @typedef {object} PinchOptions
    * @property {boolean} [noDrag] disable two-finger dragging
-   * @property {number} [percent=1] percent to modify pinch speed
-   * @property {number} [factor=1] factor to multiply two-finger drag to increase the speed of movement
+   * @property {number} [percent=1.0] percent to modify pinch speed
    * @property {PIXI.Point} [center] place this point at center during zoom instead of center of two fingers
-   * @property {('all'|'x'|'y')} [axis=all] axis to zoom
    */
 
   const pinchOptions = {
       noDrag: false,
-      percent: 1,
-      center: null,
-      factor: 1,
-      axis: 'all',
+      percent: 1.0,
+      center: null
   };
 
   class Pinch extends Plugin {
@@ -932,14 +920,6 @@
               this.active = true;
               return true
           }
-      }
-
-      isAxisX() {
-          return ['all', 'x'].includes(this.options.axis)
-      }
-
-      isAxisY() {
-          return ['all', 'y'].includes(this.options.axis)
       }
 
       move(e) {
@@ -969,14 +949,10 @@
                   }
                   let dist = Math.sqrt(Math.pow(second.last.x - first.last.x, 2) + Math.pow(second.last.y - first.last.y, 2));
                   dist = dist === 0 ? dist = 0.0000000001 : dist;
-                  const change = (1 - last / dist) * this.options.percent * (this.isAxisX() ? this.parent.scale.x : this.parent.scale.y);
-                  if (this.isAxisX()) {
-                      this.parent.scale.x += change;
-                  }
-                  if (this.isAxisY()) {
-                      this.parent.scale.y += change;
-                  }
-                  this.parent.emit('zoomed', { viewport: this.parent, type: 'pinch', center: point });
+                  const change = (1 - last / dist) * this.options.percent * this.parent.scale.x;
+                  this.parent.scale.x += change;
+                  this.parent.scale.y += change;
+                  this.parent.emit('zoomed', { viewport: this.parent, type: 'pinch' });
                   const clamp = this.parent.plugins.get('clamp-zoom', true);
                   if (clamp) {
                       clamp.clamp();
@@ -986,13 +962,13 @@
                   }
                   else {
                       const newPoint = this.parent.toGlobal(oldPoint);
-                      this.parent.x += (point.x - newPoint.x) * this.options.factor;
-                      this.parent.y += (point.y - newPoint.y) * this.options.factor;
+                      this.parent.x += point.x - newPoint.x;
+                      this.parent.y += point.y - newPoint.y;
                       this.parent.emit('moved', { viewport: this.parent, type: 'pinch' });
                   }
                   if (!this.options.noDrag && this.lastCenter) {
-                      this.parent.x += (point.x - this.lastCenter.x) * this.options.factor;
-                      this.parent.y += (point.y - this.lastCenter.y) * this.options.factor;
+                      this.parent.x += point.x - this.lastCenter.x;
+                      this.parent.y += point.y - this.lastCenter.y;
                       this.parent.emit('moved', { viewport: this.parent, type: 'pinch' });
                   }
                   this.lastCenter = point;
@@ -1023,18 +999,6 @@
   }
 
   /**
-   * There are three ways to clamp:
-   * 1. direction: 'all' = the world is clamped to its world boundaries, ie, you cannot drag any part of the world offscreen
-   *    direction: 'x' | 'y' = only the x or y direction is clamped to its world boundary
-   * 2. left, right, top, bottom = true | number = the world is clamped to the world's pixel location for each side;
-   *    if any of these are set to true, then the location is set to the boundary [0, viewport.worldWidth/viewport.worldHeight]
-   *    eg: to allow the world to be completely dragged offscreen, set [-viewport.worldWidth, -viewport.worldHeight, viewport.worldWidth * 2, viewport.worldHeight * 2]
-   *
-   * Underflow determines what happens when the world is smaller than the viewport
-   * 1. none = the world is clamped but there is no special behavior
-   * 2. center = the world is centered on the viewport
-   * 3. combination of top/bottom/center and left/right/center (case insensitive) = the world is stuck to the appropriate boundaries
-   *
    * @typedef ClampOptions
    * @property {(number|boolean)} [left=false] clamp left; true = 0
    * @property {(number|boolean)} [right=false] clamp right; true = viewport.worldWidth
@@ -1125,30 +1089,33 @@
           if (this.options.left !== null || this.options.right !== null)
           {
               let moved = false;
-              if (!this.noUnderflow && this.parent.screenWorldWidth < this.parent.screenWidth)
+              if (this.parent.screenWorldWidth < this.parent.screenWidth)
               {
-                  switch (this.underflowX)
+                  if (!this.noUnderflow)
                   {
-                      case -1:
-                          if (this.parent.x !== 0)
-                          {
-                              this.parent.x = 0;
-                              moved = true;
-                          }
-                          break
-                      case 1:
-                          if (this.parent.x !== this.parent.screenWidth - this.parent.screenWorldWidth)
-                          {
-                              this.parent.x = this.parent.screenWidth - this.parent.screenWorldWidth;
-                              moved = true;
-                          }
-                          break
-                      default:
-                          if (this.parent.x !== (this.parent.screenWidth - this.parent.screenWorldWidth) / 2)
-                          {
-                              this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
-                              moved = true;
-                          }
+                      switch (this.underflowX)
+                      {
+                          case -1:
+                              if (this.parent.x !== 0)
+                              {
+                                  this.parent.x = 0;
+                                  moved = true;
+                              }
+                              break
+                          case 1:
+                              if (this.parent.x !== this.parent.screenWidth - this.parent.screenWorldWidth)
+                              {
+                                  this.parent.x = this.parent.screenWidth - this.parent.screenWorldWidth;
+                                  moved = true;
+                              }
+                              break
+                          default:
+                              if (this.parent.x !== (this.parent.screenWidth - this.parent.screenWorldWidth) / 2)
+                              {
+                                  this.parent.x = (this.parent.screenWidth - this.parent.screenWorldWidth) / 2;
+                                  moved = true;
+                              }
+                      }
                   }
               }
               else
@@ -1180,30 +1147,33 @@
           if (this.options.top !== null || this.options.bottom !== null)
           {
               let moved = false;
-              if (!this.noUnderflow && this.parent.screenWorldHeight < this.parent.screenHeight)
+              if (this.parent.screenWorldHeight < this.parent.screenHeight)
               {
-                  switch (this.underflowY)
+                  if (!this.noUnderflow)
                   {
-                      case -1:
-                          if (this.parent.y !== 0)
-                          {
-                              this.parent.y = 0;
-                              moved = true;
-                          }
-                          break
-                      case 1:
-                          if (this.parent.y !== this.parent.screenHeight - this.parent.screenWorldHeight)
-                          {
-                              this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight);
-                              moved = true;
-                          }
-                          break
-                      default:
-                          if (this.parent.y !== (this.parent.screenHeight - this.parent.screenWorldHeight) / 2)
-                          {
-                              this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
-                              moved = true;
-                          }
+                      switch (this.underflowY)
+                      {
+                          case -1:
+                              if (this.parent.y !== 0)
+                              {
+                                  this.parent.y = 0;
+                                  moved = true;
+                              }
+                              break
+                          case 1:
+                              if (this.parent.y !== this.parent.screenHeight - this.parent.screenWorldHeight)
+                              {
+                                  this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight);
+                                  moved = true;
+                              }
+                              break
+                          default:
+                              if (this.parent.y !== (this.parent.screenHeight - this.parent.screenWorldHeight) / 2)
+                              {
+                                  this.parent.y = (this.parent.screenHeight - this.parent.screenWorldHeight) / 2;
+                                  moved = true;
+                              }
+                      }
                   }
               }
               else
@@ -1238,7 +1208,7 @@
           this.last.scaleY = this.parent.scale.y;
       }
 
-      reset()
+      reset() 
       {
           this.update();
       }
@@ -1361,15 +1331,10 @@
    */
 
   const decelerateOptions = {
-      friction: 0.98,
+      friction: 0.95,
       bounce: 0.8,
       minSpeed: 0.01
   };
-
-  /**
-   * Time period of decay (1 frame)
-   */
-  const TP = 16;
 
   class Decelerate extends Plugin {
       /**
@@ -1381,7 +1346,6 @@
           super(parent);
           this.options = Object.assign({}, decelerateOptions, options);
           this.saved = [];
-          this.timeSinceRelease = 0;
           this.reset();
           this.parent.on('moved', data => this.moved(data));
       }
@@ -1438,7 +1402,6 @@
                       this.x = (this.parent.x - save.x) / time;
                       this.y = (this.parent.y - save.y) / time;
                       this.percentChangeX = this.percentChangeY = this.options.friction;
-                      this.timeSinceRelease = 0;
                       break
                   }
               }
@@ -1468,43 +1431,23 @@
               return
           }
 
-          /*
-           * See https://github.com/davidfig/pixi-viewport/issues/271 for math.
-           *
-           * The viewport velocity (this.x, this.y) decays expoenential by the the decay factor
-           * (this.percentChangeX, this.percentChangeY) each frame. This velocity function is integrated
-           * to calculate the displacement.
-           */
-
-          const moved = this.x || this.y;
-
-          const ti = this.timeSinceRelease;
-          const tf = this.timeSinceRelease + elapsed;
-
+          let moved;
           if (this.x) {
-              const k = this.percentChangeX;
-              const lnk = Math.log(k);
-
-              this.parent.x += ((this.x * TP) / lnk) * (Math.pow(k, tf / TP) - Math.pow(k, ti / TP));
+              this.parent.x += this.x * elapsed;
+              this.x *= this.percentChangeX;
+              if (Math.abs(this.x) < this.options.minSpeed) {
+                  this.x = 0;
+              }
+              moved = true;
           }
           if (this.y) {
-              const k = this.percentChangeY;
-              const lnk = Math.log(k);
-
-              this.parent.y += ((this.y * TP) / lnk) * (Math.pow(k, tf / TP) - Math.pow(k, ti / TP));
+              this.parent.y += this.y * elapsed;
+              this.y *= this.percentChangeY;
+              if (Math.abs(this.y) < this.options.minSpeed) {
+                  this.y = 0;
+              }
+              moved = true;
           }
-
-          this.timeSinceRelease += elapsed;
-          this.x *= Math.pow(this.percentChangeX, elapsed / TP);
-          this.y *= Math.pow(this.percentChangeY, elapsed / TP);
-
-          if (Math.abs(this.x) < this.options.minSpeed) {
-              this.x = 0;
-          }
-          if (Math.abs(this.y) < this.options.minSpeed) {
-              this.y = 0;
-          }
-
           if (moved) {
               this.parent.emit('moved', { viewport: this.parent, type: 'decelerate' });
           }
@@ -1517,12 +1460,21 @@
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-  function createCommonjsModule$1(fn) {
-    var module = { exports: {} };
-  	return fn(module, module.exports), module.exports;
+  function createCommonjsModule(fn, basedir, module) {
+  	return module = {
+  		path: basedir,
+  		exports: {},
+  		require: function (path, base) {
+  			return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
+  		}
+  	}, fn(module, module.exports), module.exports;
   }
 
-  var penner = createCommonjsModule$1(function (module, exports) {
+  function commonjsRequire () {
+  	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
+  }
+
+  var penner = createCommonjsModule(function (module, exports) {
   /*
   	Copyright © 2001 Robert Penner
   	All rights reserved.
@@ -2220,19 +2172,8 @@
       }
 
       createSnapping() {
-          this.parent.scale;
-          const startWorldScreenWidth = this.parent.worldScreenWidth;
-          const startWorldScreenHeight = this.parent.worldScreenHeight;
-          const endWorldScreenWidth = this.parent.screenWidth / this.xScale;
-          const endWorldScreenHeight = this.parent.screenHeight / this.yScale;
-          
-          this.snapping = { 
-              time: 0, 
-              startX: startWorldScreenWidth, 
-              startY: startWorldScreenHeight, 
-              deltaX: endWorldScreenWidth - startWorldScreenWidth, 
-              deltaY: endWorldScreenHeight - startWorldScreenHeight 
-          };
+          const scale = this.parent.scale;
+          this.snapping = { time: 0, startX: scale.x, startY: scale.y, deltaX: this.xScale - scale.x, deltaY: this.yScale - scale.y };
           this.parent.emit('snap-zoom-start', this.parent);
       }
 
@@ -2294,11 +2235,8 @@
               }
               else {
                   const snapping = this.snapping;
-                  const worldScreenWidth = this.ease(snapping.time, snapping.startX, snapping.deltaX, this.options.time);
-                  const worldScreenHeight = this.ease(snapping.time, snapping.startY, snapping.deltaY, this.options.time);
-
-                  this.parent.scale.x = this.parent.screenWidth / worldScreenWidth;
-                  this.parent.scale.y = this.parent.screenHeight / worldScreenHeight;
+                  this.parent.scale.x = this.ease(snapping.time, snapping.startX, snapping.deltaX, this.options.time);
+                  this.parent.scale.y = this.ease(snapping.time, snapping.startY, snapping.deltaY, this.options.time);
               }
               const clamp = this.parent.plugins.get('clamp-zoom', true);
               if (clamp) {
@@ -2439,7 +2377,6 @@
    * @property {boolean} [reverse] reverse the direction of the scroll
    * @property {PIXI.Point} [center] place this point at center during zoom instead of current mouse position
    * @property {number} [lineHeight=20] scaling factor for non-DOM_DELTA_PIXEL scrolling events
-   * @property {('all'|'x'|'y')} [axis=all] axis to zoom
    */
 
   const wheelOptions = {
@@ -2448,8 +2385,7 @@
       interrupt: true,
       reverse: false,
       center: null,
-      lineHeight: 20,
-      axis: 'all',
+      lineHeight: 20
   };
 
   class Wheel extends Plugin {
@@ -2470,14 +2406,6 @@
           }
       }
 
-      isAxisX() {
-          return ['all', 'x'].includes(this.options.axis)
-      }
-
-      isAxisY() {
-          return ['all', 'y'].includes(this.options.axis)
-      }
-
       update() {
           if (this.smoothing) {
               const point = this.smoothingCenter;
@@ -2486,12 +2414,8 @@
               if (!this.options.center) {
                   oldPoint = this.parent.toLocal(point);
               }
-              if (this.isAxisX()) {
-                  this.parent.scale.x += change.x;
-              }
-              if (this.isAxisY()) {
-                  this.parent.scale.y += change.y;
-              }
+              this.parent.scale.x += change.x;
+              this.parent.scale.y += change.y;
               this.parent.emit('zoomed', { viewport: this.parent, type: 'wheel' });
               const clamp = this.parent.plugins.get('clamp-zoom', true);
               if (clamp) {
@@ -2499,7 +2423,8 @@
               }
               if (this.options.center) {
                   this.parent.moveCenter(this.options.center);
-              } else {
+              }
+              else {
                   const newPoint = this.parent.toGlobal(oldPoint);
                   this.parent.x += point.x - newPoint.x;
                   this.parent.y += point.y - newPoint.y;
@@ -2516,6 +2441,7 @@
           if (this.paused) {
               return
           }
+
           let point = this.parent.input.getPointerPosition(e);
           const sign = this.options.reverse ? -1 : 1;
           const step = sign * -e.deltaY * (e.deltaMode ? this.options.lineHeight : 1) / 500;
@@ -2531,17 +2457,14 @@
               };
               this.smoothingCount = 0;
               this.smoothingCenter = point;
-          } else {
+          }
+          else {
               let oldPoint;
               if (!this.options.center) {
                   oldPoint = this.parent.toLocal(point);
               }
-              if (this.isAxisX()) {
-                  this.parent.scale.x *= change;
-              }
-              if (this.isAxisY()) {
-                  this.parent.scale.y *= change;
-              }
+              this.parent.scale.x *= change;
+              this.parent.scale.y *= change;
               this.parent.emit('zoomed', { viewport: this.parent, type: 'wheel' });
               const clamp = this.parent.plugins.get('clamp-zoom', true);
               if (clamp) {
@@ -2549,7 +2472,8 @@
               }
               if (this.options.center) {
                   this.parent.moveCenter(this.options.center);
-              } else {
+              }
+              else {
                   const newPoint = this.parent.toGlobal(oldPoint);
                   this.parent.x += point.x - newPoint.x;
                   this.parent.y += point.y - newPoint.y;
@@ -3255,13 +3179,9 @@
               x = arguments[0].x;
               y = arguments[0].y;
           }
-          const newX = (this.worldScreenWidth / 2 - x) * this.scale.x;
-          const newY = (this.worldScreenHeight / 2 - y) * this.scale.y;
-          if (this.x !== newX || this.y !== newY) {
-              this.position.set(newX, newY);
-              this.plugins.reset();
-              this.dirty = true;
-          }
+          this.position.set((this.worldScreenWidth / 2 - x) * this.scale.x, (this.worldScreenHeight / 2 - y) * this.scale.y);
+          this.plugins.reset();
+          this.dirty = true;
           return this
       }
 
@@ -3282,20 +3202,14 @@
        * @param {number} [y]
        * @return {Viewport} this
        */
-      moveCorner() {
-          let x, y;
+      moveCorner(x, y) {
           if (arguments.length === 1) {
-              x = -arguments[0].x * this.scale.x;
-              y = -arguments[0].y * this.scale.y;
-          } else {
-              x = -arguments[0] * this.scale.x;
-              y = -arguments[1] * this.scale.y;
+              this.position.set(-x.x * this.scale.x, -x.y * this.scale.y);
           }
-          if (x !== this.x || y !== this.y) {
-              this.position.set(x, y);
-              this.plugins.reset();
-              this.dirty = true;
+          else {
+              this.position.set(-x * this.scale.x, -y * this.scale.y);
           }
+          this.plugins.reset();
           return this
       }
 
@@ -3479,13 +3393,6 @@
               this.moveCenter(save);
           }
           return this
-      }
-
-      set visible(value) {
-          if (!value) {
-              this.input.clear();
-          }
-          super.visible = value;
       }
 
       /**
@@ -3844,1261 +3751,9 @@
       }
   }
 
-  /*!
-   * @pixi/math - v5.3.9
-   * Compiled Wed, 24 Mar 2021 19:54:16 UTC
-   *
-   * @pixi/math is licensed under the MIT License.
-   * http://www.opensource.org/licenses/mit-license
-   */
-  /**
-   * Two Pi.
-   *
-   * @static
-   * @constant {number} PI_2
-   * @memberof PIXI
-   */
-  var PI_2 = Math.PI * 2;
-  var SHAPES;
-  (function (SHAPES) {
-      SHAPES[SHAPES["POLY"] = 0] = "POLY";
-      SHAPES[SHAPES["RECT"] = 1] = "RECT";
-      SHAPES[SHAPES["CIRC"] = 2] = "CIRC";
-      SHAPES[SHAPES["ELIP"] = 3] = "ELIP";
-      SHAPES[SHAPES["RREC"] = 4] = "RREC";
-  })(SHAPES || (SHAPES = {}));
-  /**
-   * Constants that identify shapes, mainly to prevent `instanceof` calls.
-   *
-   * @static
-   * @constant
-   * @name SHAPES
-   * @memberof PIXI
-   * @type {enum}
-   * @property {number} POLY Polygon
-   * @property {number} RECT Rectangle
-   * @property {number} CIRC Circle
-   * @property {number} ELIP Ellipse
-   * @property {number} RREC Rounded Rectangle
-   * @enum {number}
-   */
-
-  /**
-   * Size object, contains width and height
-   *
-   * @memberof PIXI
-   * @typedef {object} ISize
-   * @property {number} width - Width component
-   * @property {number} height - Height component
-   */
-  /**
-   * Rectangle object is an area defined by its position, as indicated by its top-left corner
-   * point (x, y) and by its width and its height.
-   *
-   * @class
-   * @memberof PIXI
-   */
-  var Rectangle = /** @class */ (function () {
-      /**
-       * @param {number} [x=0] - The X coordinate of the upper-left corner of the rectangle
-       * @param {number} [y=0] - The Y coordinate of the upper-left corner of the rectangle
-       * @param {number} [width=0] - The overall width of this rectangle
-       * @param {number} [height=0] - The overall height of this rectangle
-       */
-      function Rectangle(x, y, width, height) {
-          if (x === void 0) { x = 0; }
-          if (y === void 0) { y = 0; }
-          if (width === void 0) { width = 0; }
-          if (height === void 0) { height = 0; }
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.x = Number(x);
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.y = Number(y);
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.width = Number(width);
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.height = Number(height);
-          /**
-           * The type of the object, mainly used to avoid `instanceof` checks
-           *
-           * @member {number}
-           * @readOnly
-           * @default PIXI.SHAPES.RECT
-           * @see PIXI.SHAPES
-           */
-          this.type = SHAPES.RECT;
-      }
-      Object.defineProperty(Rectangle.prototype, "left", {
-          /**
-           * returns the left edge of the rectangle
-           *
-           * @member {number}
-           */
-          get: function () {
-              return this.x;
-          },
-          enumerable: false,
-          configurable: true
-      });
-      Object.defineProperty(Rectangle.prototype, "right", {
-          /**
-           * returns the right edge of the rectangle
-           *
-           * @member {number}
-           */
-          get: function () {
-              return this.x + this.width;
-          },
-          enumerable: false,
-          configurable: true
-      });
-      Object.defineProperty(Rectangle.prototype, "top", {
-          /**
-           * returns the top edge of the rectangle
-           *
-           * @member {number}
-           */
-          get: function () {
-              return this.y;
-          },
-          enumerable: false,
-          configurable: true
-      });
-      Object.defineProperty(Rectangle.prototype, "bottom", {
-          /**
-           * returns the bottom edge of the rectangle
-           *
-           * @member {number}
-           */
-          get: function () {
-              return this.y + this.height;
-          },
-          enumerable: false,
-          configurable: true
-      });
-      Object.defineProperty(Rectangle, "EMPTY", {
-          /**
-           * A constant empty rectangle.
-           *
-           * @static
-           * @constant
-           * @member {PIXI.Rectangle}
-           * @return {PIXI.Rectangle} An empty rectangle
-           */
-          get: function () {
-              return new Rectangle(0, 0, 0, 0);
-          },
-          enumerable: false,
-          configurable: true
-      });
-      /**
-       * Creates a clone of this Rectangle
-       *
-       * @return {PIXI.Rectangle} a copy of the rectangle
-       */
-      Rectangle.prototype.clone = function () {
-          return new Rectangle(this.x, this.y, this.width, this.height);
-      };
-      /**
-       * Copies another rectangle to this one.
-       *
-       * @param {PIXI.Rectangle} rectangle - The rectangle to copy from.
-       * @return {PIXI.Rectangle} Returns itself.
-       */
-      Rectangle.prototype.copyFrom = function (rectangle) {
-          this.x = rectangle.x;
-          this.y = rectangle.y;
-          this.width = rectangle.width;
-          this.height = rectangle.height;
-          return this;
-      };
-      /**
-       * Copies this rectangle to another one.
-       *
-       * @param {PIXI.Rectangle} rectangle - The rectangle to copy to.
-       * @return {PIXI.Rectangle} Returns given parameter.
-       */
-      Rectangle.prototype.copyTo = function (rectangle) {
-          rectangle.x = this.x;
-          rectangle.y = this.y;
-          rectangle.width = this.width;
-          rectangle.height = this.height;
-          return rectangle;
-      };
-      /**
-       * Checks whether the x and y coordinates given are contained within this Rectangle
-       *
-       * @param {number} x - The X coordinate of the point to test
-       * @param {number} y - The Y coordinate of the point to test
-       * @return {boolean} Whether the x/y coordinates are within this Rectangle
-       */
-      Rectangle.prototype.contains = function (x, y) {
-          if (this.width <= 0 || this.height <= 0) {
-              return false;
-          }
-          if (x >= this.x && x < this.x + this.width) {
-              if (y >= this.y && y < this.y + this.height) {
-                  return true;
-              }
-          }
-          return false;
-      };
-      /**
-       * Pads the rectangle making it grow in all directions.
-       * If paddingY is omitted, both paddingX and paddingY will be set to paddingX.
-       *
-       * @param {number} [paddingX=0] - The horizontal padding amount.
-       * @param {number} [paddingY=0] - The vertical padding amount.
-       * @return {PIXI.Rectangle} Returns itself.
-       */
-      Rectangle.prototype.pad = function (paddingX, paddingY) {
-          if (paddingX === void 0) { paddingX = 0; }
-          if (paddingY === void 0) { paddingY = paddingX; }
-          this.x -= paddingX;
-          this.y -= paddingY;
-          this.width += paddingX * 2;
-          this.height += paddingY * 2;
-          return this;
-      };
-      /**
-       * Fits this rectangle around the passed one.
-       *
-       * @param {PIXI.Rectangle} rectangle - The rectangle to fit.
-       * @return {PIXI.Rectangle} Returns itself.
-       */
-      Rectangle.prototype.fit = function (rectangle) {
-          var x1 = Math.max(this.x, rectangle.x);
-          var x2 = Math.min(this.x + this.width, rectangle.x + rectangle.width);
-          var y1 = Math.max(this.y, rectangle.y);
-          var y2 = Math.min(this.y + this.height, rectangle.y + rectangle.height);
-          this.x = x1;
-          this.width = Math.max(x2 - x1, 0);
-          this.y = y1;
-          this.height = Math.max(y2 - y1, 0);
-          return this;
-      };
-      /**
-       * Enlarges rectangle that way its corners lie on grid
-       *
-       * @param {number} [resolution=1] resolution
-       * @param {number} [eps=0.001] precision
-       * @return {PIXI.Rectangle} Returns itself.
-       */
-      Rectangle.prototype.ceil = function (resolution, eps) {
-          if (resolution === void 0) { resolution = 1; }
-          if (eps === void 0) { eps = 0.001; }
-          var x2 = Math.ceil((this.x + this.width - eps) * resolution) / resolution;
-          var y2 = Math.ceil((this.y + this.height - eps) * resolution) / resolution;
-          this.x = Math.floor((this.x + eps) * resolution) / resolution;
-          this.y = Math.floor((this.y + eps) * resolution) / resolution;
-          this.width = x2 - this.x;
-          this.height = y2 - this.y;
-          return this;
-      };
-      /**
-       * Enlarges this rectangle to include the passed rectangle.
-       *
-       * @param {PIXI.Rectangle} rectangle - The rectangle to include.
-       * @return {PIXI.Rectangle} Returns itself.
-       */
-      Rectangle.prototype.enlarge = function (rectangle) {
-          var x1 = Math.min(this.x, rectangle.x);
-          var x2 = Math.max(this.x + this.width, rectangle.x + rectangle.width);
-          var y1 = Math.min(this.y, rectangle.y);
-          var y2 = Math.max(this.y + this.height, rectangle.y + rectangle.height);
-          this.x = x1;
-          this.width = x2 - x1;
-          this.y = y1;
-          this.height = y2 - y1;
-          return this;
-      };
-      return Rectangle;
-  }());
-
-  /**
-   * Common interface for points. Both Point and ObservablePoint implement it
-   * @memberof PIXI
-   * @interface IPointData
-   */
-  /**
-   * X coord
-   * @memberof PIXI.IPointData#
-   * @member {number} x
-   */
-  /**
-   * Y coord
-   * @memberof PIXI.IPointData#
-   * @member {number} y
-   */
-
-  /**
-   * Common interface for points. Both Point and ObservablePoint implement it
-   * @memberof PIXI
-   * @interface IPoint
-   * @extends PIXI.IPointData
-   */
-  /**
-   * Sets the point to a new x and y position.
-   * If y is omitted, both x and y will be set to x.
-   *
-   * @method set
-   * @memberof PIXI.IPoint#
-   * @param {number} [x=0] - position of the point on the x axis
-   * @param {number} [y=x] - position of the point on the y axis
-   */
-  /**
-   * Copies x and y from the given point
-   * @method copyFrom
-   * @memberof PIXI.IPoint#
-   * @param {PIXI.IPointData} p - The point to copy from
-   * @returns {this} Returns itself.
-   */
-  /**
-   * Copies x and y into the given point
-   * @method copyTo
-   * @memberof PIXI.IPoint#
-   * @param {PIXI.IPoint} p - The point to copy.
-   * @returns {PIXI.IPoint} Given point with values updated
-   */
-  /**
-   * Returns true if the given point is equal to this point
-   *
-   * @method equals
-   * @memberof PIXI.IPoint#
-   * @param {PIXI.IPointData} p - The point to check
-   * @returns {boolean} Whether the given point equal to this point
-   */
-
-  /**
-   * The Point object represents a location in a two-dimensional coordinate system, where x represents
-   * the horizontal axis and y represents the vertical axis.
-   *
-   * @class
-   * @memberof PIXI
-   * @implements IPoint
-   */
-  var Point = /** @class */ (function () {
-      /**
-       * @param {number} [x=0] - position of the point on the x axis
-       * @param {number} [y=0] - position of the point on the y axis
-       */
-      function Point(x, y) {
-          if (x === void 0) { x = 0; }
-          if (y === void 0) { y = 0; }
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.x = x;
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.y = y;
-      }
-      /**
-       * Creates a clone of this point
-       *
-       * @return {PIXI.Point} a copy of the point
-       */
-      Point.prototype.clone = function () {
-          return new Point(this.x, this.y);
-      };
-      /**
-       * Copies x and y from the given point
-       *
-       * @param {PIXI.IPointData} p - The point to copy from
-       * @returns {this} Returns itself.
-       */
-      Point.prototype.copyFrom = function (p) {
-          this.set(p.x, p.y);
-          return this;
-      };
-      /**
-       * Copies x and y into the given point
-       *
-       * @param {PIXI.IPoint} p - The point to copy.
-       * @returns {PIXI.IPoint} Given point with values updated
-       */
-      Point.prototype.copyTo = function (p) {
-          p.set(this.x, this.y);
-          return p;
-      };
-      /**
-       * Returns true if the given point is equal to this point
-       *
-       * @param {PIXI.IPointData} p - The point to check
-       * @returns {boolean} Whether the given point equal to this point
-       */
-      Point.prototype.equals = function (p) {
-          return (p.x === this.x) && (p.y === this.y);
-      };
-      /**
-       * Sets the point to a new x and y position.
-       * If y is omitted, both x and y will be set to x.
-       *
-       * @param {number} [x=0] - position of the point on the x axis
-       * @param {number} [y=x] - position of the point on the y axis
-       * @returns {this} Returns itself.
-       */
-      Point.prototype.set = function (x, y) {
-          if (x === void 0) { x = 0; }
-          if (y === void 0) { y = x; }
-          this.x = x;
-          this.y = y;
-          return this;
-      };
-      return Point;
-  }());
-
-  /**
-   * The Point object represents a location in a two-dimensional coordinate system, where x represents
-   * the horizontal axis and y represents the vertical axis.
-   *
-   * An ObservablePoint is a point that triggers a callback when the point's position is changed.
-   *
-   * @class
-   * @memberof PIXI
-   * @implements IPoint
-   */
-  var ObservablePoint = /** @class */ (function () {
-      /**
-       * @param {Function} cb - callback when changed
-       * @param {object} scope - owner of callback
-       * @param {number} [x=0] - position of the point on the x axis
-       * @param {number} [y=0] - position of the point on the y axis
-       */
-      function ObservablePoint(cb, scope, x, y) {
-          if (x === void 0) { x = 0; }
-          if (y === void 0) { y = 0; }
-          this._x = x;
-          this._y = y;
-          this.cb = cb;
-          this.scope = scope;
-      }
-      /**
-       * Creates a clone of this point.
-       * The callback and scope params can be overidden otherwise they will default
-       * to the clone object's values.
-       *
-       * @override
-       * @param {Function} [cb=null] - callback when changed
-       * @param {object} [scope=null] - owner of callback
-       * @return {PIXI.ObservablePoint} a copy of the point
-       */
-      ObservablePoint.prototype.clone = function (cb, scope) {
-          if (cb === void 0) { cb = this.cb; }
-          if (scope === void 0) { scope = this.scope; }
-          return new ObservablePoint(cb, scope, this._x, this._y);
-      };
-      /**
-       * Sets the point to a new x and y position.
-       * If y is omitted, both x and y will be set to x.
-       *
-       * @param {number} [x=0] - position of the point on the x axis
-       * @param {number} [y=x] - position of the point on the y axis
-       * @returns {this} Returns itself.
-       */
-      ObservablePoint.prototype.set = function (x, y) {
-          if (x === void 0) { x = 0; }
-          if (y === void 0) { y = x; }
-          if (this._x !== x || this._y !== y) {
-              this._x = x;
-              this._y = y;
-              this.cb.call(this.scope);
-          }
-          return this;
-      };
-      /**
-       * Copies x and y from the given point
-       *
-       * @param {PIXI.IPointData} p - The point to copy from.
-       * @returns {this} Returns itself.
-       */
-      ObservablePoint.prototype.copyFrom = function (p) {
-          if (this._x !== p.x || this._y !== p.y) {
-              this._x = p.x;
-              this._y = p.y;
-              this.cb.call(this.scope);
-          }
-          return this;
-      };
-      /**
-       * Copies x and y into the given point
-       *
-       * @param {PIXI.IPoint} p - The point to copy.
-       * @returns {PIXI.IPoint} Given point with values updated
-       */
-      ObservablePoint.prototype.copyTo = function (p) {
-          p.set(this._x, this._y);
-          return p;
-      };
-      /**
-       * Returns true if the given point is equal to this point
-       *
-       * @param {PIXI.IPointData} p - The point to check
-       * @returns {boolean} Whether the given point equal to this point
-       */
-      ObservablePoint.prototype.equals = function (p) {
-          return (p.x === this._x) && (p.y === this._y);
-      };
-      Object.defineProperty(ObservablePoint.prototype, "x", {
-          /**
-           * The position of the displayObject on the x axis relative to the local coordinates of the parent.
-           *
-           * @member {number}
-           */
-          get: function () {
-              return this._x;
-          },
-          set: function (value) {
-              if (this._x !== value) {
-                  this._x = value;
-                  this.cb.call(this.scope);
-              }
-          },
-          enumerable: false,
-          configurable: true
-      });
-      Object.defineProperty(ObservablePoint.prototype, "y", {
-          /**
-           * The position of the displayObject on the x axis relative to the local coordinates of the parent.
-           *
-           * @member {number}
-           */
-          get: function () {
-              return this._y;
-          },
-          set: function (value) {
-              if (this._y !== value) {
-                  this._y = value;
-                  this.cb.call(this.scope);
-              }
-          },
-          enumerable: false,
-          configurable: true
-      });
-      return ObservablePoint;
-  }());
-
-  /**
-   * The PixiJS Matrix as a class makes it a lot faster.
-   *
-   * Here is a representation of it:
-   * ```js
-   * | a | c | tx|
-   * | b | d | ty|
-   * | 0 | 0 | 1 |
-   * ```
-   * @class
-   * @memberof PIXI
-   */
-  var Matrix = /** @class */ (function () {
-      /**
-       * @param {number} [a=1] - x scale
-       * @param {number} [b=0] - x skew
-       * @param {number} [c=0] - y skew
-       * @param {number} [d=1] - y scale
-       * @param {number} [tx=0] - x translation
-       * @param {number} [ty=0] - y translation
-       */
-      function Matrix(a, b, c, d, tx, ty) {
-          if (a === void 0) { a = 1; }
-          if (b === void 0) { b = 0; }
-          if (c === void 0) { c = 0; }
-          if (d === void 0) { d = 1; }
-          if (tx === void 0) { tx = 0; }
-          if (ty === void 0) { ty = 0; }
-          this.array = null;
-          /**
-           * @member {number}
-           * @default 1
-           */
-          this.a = a;
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.b = b;
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.c = c;
-          /**
-           * @member {number}
-           * @default 1
-           */
-          this.d = d;
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.tx = tx;
-          /**
-           * @member {number}
-           * @default 0
-           */
-          this.ty = ty;
-      }
-      /**
-       * Creates a Matrix object based on the given array. The Element to Matrix mapping order is as follows:
-       *
-       * a = array[0]
-       * b = array[1]
-       * c = array[3]
-       * d = array[4]
-       * tx = array[2]
-       * ty = array[5]
-       *
-       * @param {number[]} array - The array that the matrix will be populated from.
-       */
-      Matrix.prototype.fromArray = function (array) {
-          this.a = array[0];
-          this.b = array[1];
-          this.c = array[3];
-          this.d = array[4];
-          this.tx = array[2];
-          this.ty = array[5];
-      };
-      /**
-       * sets the matrix properties
-       *
-       * @param {number} a - Matrix component
-       * @param {number} b - Matrix component
-       * @param {number} c - Matrix component
-       * @param {number} d - Matrix component
-       * @param {number} tx - Matrix component
-       * @param {number} ty - Matrix component
-       *
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.set = function (a, b, c, d, tx, ty) {
-          this.a = a;
-          this.b = b;
-          this.c = c;
-          this.d = d;
-          this.tx = tx;
-          this.ty = ty;
-          return this;
-      };
-      /**
-       * Creates an array from the current Matrix object.
-       *
-       * @param {boolean} transpose - Whether we need to transpose the matrix or not
-       * @param {Float32Array} [out=new Float32Array(9)] - If provided the array will be assigned to out
-       * @return {number[]} the newly created array which contains the matrix
-       */
-      Matrix.prototype.toArray = function (transpose, out) {
-          if (!this.array) {
-              this.array = new Float32Array(9);
-          }
-          var array = out || this.array;
-          if (transpose) {
-              array[0] = this.a;
-              array[1] = this.b;
-              array[2] = 0;
-              array[3] = this.c;
-              array[4] = this.d;
-              array[5] = 0;
-              array[6] = this.tx;
-              array[7] = this.ty;
-              array[8] = 1;
-          }
-          else {
-              array[0] = this.a;
-              array[1] = this.c;
-              array[2] = this.tx;
-              array[3] = this.b;
-              array[4] = this.d;
-              array[5] = this.ty;
-              array[6] = 0;
-              array[7] = 0;
-              array[8] = 1;
-          }
-          return array;
-      };
-      /**
-       * Get a new position with the current transformation applied.
-       * Can be used to go from a child's coordinate space to the world coordinate space. (e.g. rendering)
-       *
-       * @param {PIXI.IPointData} pos - The origin
-       * @param {PIXI.Point} [newPos] - The point that the new position is assigned to (allowed to be same as input)
-       * @return {PIXI.Point} The new point, transformed through this matrix
-       */
-      Matrix.prototype.apply = function (pos, newPos) {
-          newPos = (newPos || new Point());
-          var x = pos.x;
-          var y = pos.y;
-          newPos.x = (this.a * x) + (this.c * y) + this.tx;
-          newPos.y = (this.b * x) + (this.d * y) + this.ty;
-          return newPos;
-      };
-      /**
-       * Get a new position with the inverse of the current transformation applied.
-       * Can be used to go from the world coordinate space to a child's coordinate space. (e.g. input)
-       *
-       * @param {PIXI.IPointData} pos - The origin
-       * @param {PIXI.Point} [newPos] - The point that the new position is assigned to (allowed to be same as input)
-       * @return {PIXI.Point} The new point, inverse-transformed through this matrix
-       */
-      Matrix.prototype.applyInverse = function (pos, newPos) {
-          newPos = (newPos || new Point());
-          var id = 1 / ((this.a * this.d) + (this.c * -this.b));
-          var x = pos.x;
-          var y = pos.y;
-          newPos.x = (this.d * id * x) + (-this.c * id * y) + (((this.ty * this.c) - (this.tx * this.d)) * id);
-          newPos.y = (this.a * id * y) + (-this.b * id * x) + (((-this.ty * this.a) + (this.tx * this.b)) * id);
-          return newPos;
-      };
-      /**
-       * Translates the matrix on the x and y.
-       *
-       * @param {number} x - How much to translate x by
-       * @param {number} y - How much to translate y by
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.translate = function (x, y) {
-          this.tx += x;
-          this.ty += y;
-          return this;
-      };
-      /**
-       * Applies a scale transformation to the matrix.
-       *
-       * @param {number} x - The amount to scale horizontally
-       * @param {number} y - The amount to scale vertically
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.scale = function (x, y) {
-          this.a *= x;
-          this.d *= y;
-          this.c *= x;
-          this.b *= y;
-          this.tx *= x;
-          this.ty *= y;
-          return this;
-      };
-      /**
-       * Applies a rotation transformation to the matrix.
-       *
-       * @param {number} angle - The angle in radians.
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.rotate = function (angle) {
-          var cos = Math.cos(angle);
-          var sin = Math.sin(angle);
-          var a1 = this.a;
-          var c1 = this.c;
-          var tx1 = this.tx;
-          this.a = (a1 * cos) - (this.b * sin);
-          this.b = (a1 * sin) + (this.b * cos);
-          this.c = (c1 * cos) - (this.d * sin);
-          this.d = (c1 * sin) + (this.d * cos);
-          this.tx = (tx1 * cos) - (this.ty * sin);
-          this.ty = (tx1 * sin) + (this.ty * cos);
-          return this;
-      };
-      /**
-       * Appends the given Matrix to this Matrix.
-       *
-       * @param {PIXI.Matrix} matrix - The matrix to append.
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.append = function (matrix) {
-          var a1 = this.a;
-          var b1 = this.b;
-          var c1 = this.c;
-          var d1 = this.d;
-          this.a = (matrix.a * a1) + (matrix.b * c1);
-          this.b = (matrix.a * b1) + (matrix.b * d1);
-          this.c = (matrix.c * a1) + (matrix.d * c1);
-          this.d = (matrix.c * b1) + (matrix.d * d1);
-          this.tx = (matrix.tx * a1) + (matrix.ty * c1) + this.tx;
-          this.ty = (matrix.tx * b1) + (matrix.ty * d1) + this.ty;
-          return this;
-      };
-      /**
-       * Sets the matrix based on all the available properties
-       *
-       * @param {number} x - Position on the x axis
-       * @param {number} y - Position on the y axis
-       * @param {number} pivotX - Pivot on the x axis
-       * @param {number} pivotY - Pivot on the y axis
-       * @param {number} scaleX - Scale on the x axis
-       * @param {number} scaleY - Scale on the y axis
-       * @param {number} rotation - Rotation in radians
-       * @param {number} skewX - Skew on the x axis
-       * @param {number} skewY - Skew on the y axis
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.setTransform = function (x, y, pivotX, pivotY, scaleX, scaleY, rotation, skewX, skewY) {
-          this.a = Math.cos(rotation + skewY) * scaleX;
-          this.b = Math.sin(rotation + skewY) * scaleX;
-          this.c = -Math.sin(rotation - skewX) * scaleY;
-          this.d = Math.cos(rotation - skewX) * scaleY;
-          this.tx = x - ((pivotX * this.a) + (pivotY * this.c));
-          this.ty = y - ((pivotX * this.b) + (pivotY * this.d));
-          return this;
-      };
-      /**
-       * Prepends the given Matrix to this Matrix.
-       *
-       * @param {PIXI.Matrix} matrix - The matrix to prepend
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.prepend = function (matrix) {
-          var tx1 = this.tx;
-          if (matrix.a !== 1 || matrix.b !== 0 || matrix.c !== 0 || matrix.d !== 1) {
-              var a1 = this.a;
-              var c1 = this.c;
-              this.a = (a1 * matrix.a) + (this.b * matrix.c);
-              this.b = (a1 * matrix.b) + (this.b * matrix.d);
-              this.c = (c1 * matrix.a) + (this.d * matrix.c);
-              this.d = (c1 * matrix.b) + (this.d * matrix.d);
-          }
-          this.tx = (tx1 * matrix.a) + (this.ty * matrix.c) + matrix.tx;
-          this.ty = (tx1 * matrix.b) + (this.ty * matrix.d) + matrix.ty;
-          return this;
-      };
-      /**
-       * Decomposes the matrix (x, y, scaleX, scaleY, and rotation) and sets the properties on to a transform.
-       *
-       * @param {PIXI.Transform} transform - The transform to apply the properties to.
-       * @return {PIXI.Transform} The transform with the newly applied properties
-       */
-      Matrix.prototype.decompose = function (transform) {
-          // sort out rotation / skew..
-          var a = this.a;
-          var b = this.b;
-          var c = this.c;
-          var d = this.d;
-          var skewX = -Math.atan2(-c, d);
-          var skewY = Math.atan2(b, a);
-          var delta = Math.abs(skewX + skewY);
-          if (delta < 0.00001 || Math.abs(PI_2 - delta) < 0.00001) {
-              transform.rotation = skewY;
-              transform.skew.x = transform.skew.y = 0;
-          }
-          else {
-              transform.rotation = 0;
-              transform.skew.x = skewX;
-              transform.skew.y = skewY;
-          }
-          // next set scale
-          transform.scale.x = Math.sqrt((a * a) + (b * b));
-          transform.scale.y = Math.sqrt((c * c) + (d * d));
-          // next set position
-          transform.position.x = this.tx;
-          transform.position.y = this.ty;
-          return transform;
-      };
-      /**
-       * Inverts this matrix
-       *
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.invert = function () {
-          var a1 = this.a;
-          var b1 = this.b;
-          var c1 = this.c;
-          var d1 = this.d;
-          var tx1 = this.tx;
-          var n = (a1 * d1) - (b1 * c1);
-          this.a = d1 / n;
-          this.b = -b1 / n;
-          this.c = -c1 / n;
-          this.d = a1 / n;
-          this.tx = ((c1 * this.ty) - (d1 * tx1)) / n;
-          this.ty = -((a1 * this.ty) - (b1 * tx1)) / n;
-          return this;
-      };
-      /**
-       * Resets this Matrix to an identity (default) matrix.
-       *
-       * @return {PIXI.Matrix} This matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.identity = function () {
-          this.a = 1;
-          this.b = 0;
-          this.c = 0;
-          this.d = 1;
-          this.tx = 0;
-          this.ty = 0;
-          return this;
-      };
-      /**
-       * Creates a new Matrix object with the same values as this one.
-       *
-       * @return {PIXI.Matrix} A copy of this matrix. Good for chaining method calls.
-       */
-      Matrix.prototype.clone = function () {
-          var matrix = new Matrix();
-          matrix.a = this.a;
-          matrix.b = this.b;
-          matrix.c = this.c;
-          matrix.d = this.d;
-          matrix.tx = this.tx;
-          matrix.ty = this.ty;
-          return matrix;
-      };
-      /**
-       * Changes the values of the given matrix to be the same as the ones in this matrix
-       *
-       * @param {PIXI.Matrix} matrix - The matrix to copy to.
-       * @return {PIXI.Matrix} The matrix given in parameter with its values updated.
-       */
-      Matrix.prototype.copyTo = function (matrix) {
-          matrix.a = this.a;
-          matrix.b = this.b;
-          matrix.c = this.c;
-          matrix.d = this.d;
-          matrix.tx = this.tx;
-          matrix.ty = this.ty;
-          return matrix;
-      };
-      /**
-       * Changes the values of the matrix to be the same as the ones in given matrix
-       *
-       * @param {PIXI.Matrix} matrix - The matrix to copy from.
-       * @return {PIXI.Matrix} this
-       */
-      Matrix.prototype.copyFrom = function (matrix) {
-          this.a = matrix.a;
-          this.b = matrix.b;
-          this.c = matrix.c;
-          this.d = matrix.d;
-          this.tx = matrix.tx;
-          this.ty = matrix.ty;
-          return this;
-      };
-      Object.defineProperty(Matrix, "IDENTITY", {
-          /**
-           * A default (identity) matrix
-           *
-           * @static
-           * @const
-           * @member {PIXI.Matrix}
-           */
-          get: function () {
-              return new Matrix();
-          },
-          enumerable: false,
-          configurable: true
-      });
-      Object.defineProperty(Matrix, "TEMP_MATRIX", {
-          /**
-           * A temp matrix
-           *
-           * @static
-           * @const
-           * @member {PIXI.Matrix}
-           */
-          get: function () {
-              return new Matrix();
-          },
-          enumerable: false,
-          configurable: true
-      });
-      return Matrix;
-  }());
-
-  // Your friendly neighbour https://en.wikipedia.org/wiki/Dihedral_group
-  /*
-   * Transform matrix for operation n is:
-   * | ux | vx |
-   * | uy | vy |
-   */
-  var ux = [1, 1, 0, -1, -1, -1, 0, 1, 1, 1, 0, -1, -1, -1, 0, 1];
-  var uy = [0, 1, 1, 1, 0, -1, -1, -1, 0, 1, 1, 1, 0, -1, -1, -1];
-  var vx = [0, -1, -1, -1, 0, 1, 1, 1, 0, 1, 1, 1, 0, -1, -1, -1];
-  var vy = [1, 1, 0, -1, -1, -1, 0, 1, -1, -1, 0, 1, 1, 1, 0, -1];
-  /*
-   * Alias for {@code Math.sign}.
-   */
-  var signum = Math.sign;
-  /*
-   * Initializes `rotationCayley` and `rotationMatrices`. It is called
-   * only once below.
-   */
-  function init() {
-      for (var i = 0; i < 16; i++) {
-          var row = [];
-          for (var j = 0; j < 16; j++) {
-              /* Multiplies rotation matrices i and j. */
-              var _ux = signum((ux[i] * ux[j]) + (vx[i] * uy[j]));
-              var _uy = signum((uy[i] * ux[j]) + (vy[i] * uy[j]));
-              var _vx = signum((ux[i] * vx[j]) + (vx[i] * vy[j]));
-              var _vy = signum((uy[i] * vx[j]) + (vy[i] * vy[j]));
-              /* Finds rotation matrix matching the product and pushes it. */
-              for (var k = 0; k < 16; k++) {
-                  if (ux[k] === _ux && uy[k] === _uy
-                      && vx[k] === _vx && vy[k] === _vy) {
-                      row.push(k);
-                      break;
-                  }
-              }
-          }
-      }
-      for (var i = 0; i < 16; i++) {
-          var mat = new Matrix();
-          mat.set(ux[i], uy[i], vx[i], vy[i], 0, 0);
-      }
-  }
-  init();
-
-  /**
-   * Transform that takes care about its versions
-   *
-   * @class
-   * @memberof PIXI
-   */
-  /** @class */ ((function () {
-      function Transform() {
-          /**
-           * The world transformation matrix.
-           *
-           * @member {PIXI.Matrix}
-           */
-          this.worldTransform = new Matrix();
-          /**
-           * The local transformation matrix.
-           *
-           * @member {PIXI.Matrix}
-           */
-          this.localTransform = new Matrix();
-          /**
-           * The coordinate of the object relative to the local coordinates of the parent.
-           *
-           * @member {PIXI.ObservablePoint}
-           */
-          this.position = new ObservablePoint(this.onChange, this, 0, 0);
-          /**
-           * The scale factor of the object.
-           *
-           * @member {PIXI.ObservablePoint}
-           */
-          this.scale = new ObservablePoint(this.onChange, this, 1, 1);
-          /**
-           * The pivot point of the displayObject that it rotates around.
-           *
-           * @member {PIXI.ObservablePoint}
-           */
-          this.pivot = new ObservablePoint(this.onChange, this, 0, 0);
-          /**
-           * The skew amount, on the x and y axis.
-           *
-           * @member {PIXI.ObservablePoint}
-           */
-          this.skew = new ObservablePoint(this.updateSkew, this, 0, 0);
-          /**
-           * The rotation amount.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._rotation = 0;
-          /**
-           * The X-coordinate value of the normalized local X axis,
-           * the first column of the local transformation matrix without a scale.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._cx = 1;
-          /**
-           * The Y-coordinate value of the normalized local X axis,
-           * the first column of the local transformation matrix without a scale.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._sx = 0;
-          /**
-           * The X-coordinate value of the normalized local Y axis,
-           * the second column of the local transformation matrix without a scale.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._cy = 0;
-          /**
-           * The Y-coordinate value of the normalized local Y axis,
-           * the second column of the local transformation matrix without a scale.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._sy = 1;
-          /**
-           * The locally unique ID of the local transform.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._localID = 0;
-          /**
-           * The locally unique ID of the local transform
-           * used to calculate the current local transformation matrix.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._currentLocalID = 0;
-          /**
-           * The locally unique ID of the world transform.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._worldID = 0;
-          /**
-           * The locally unique ID of the parent's world transform
-           * used to calculate the current world transformation matrix.
-           *
-           * @protected
-           * @member {number}
-           */
-          this._parentID = 0;
-      }
-      /**
-       * Called when a value changes.
-       *
-       * @protected
-       */
-      Transform.prototype.onChange = function () {
-          this._localID++;
-      };
-      /**
-       * Called when the skew or the rotation changes.
-       *
-       * @protected
-       */
-      Transform.prototype.updateSkew = function () {
-          this._cx = Math.cos(this._rotation + this.skew.y);
-          this._sx = Math.sin(this._rotation + this.skew.y);
-          this._cy = -Math.sin(this._rotation - this.skew.x); // cos, added PI/2
-          this._sy = Math.cos(this._rotation - this.skew.x); // sin, added PI/2
-          this._localID++;
-      };
-      /**
-       * Updates the local transformation matrix.
-       */
-      Transform.prototype.updateLocalTransform = function () {
-          var lt = this.localTransform;
-          if (this._localID !== this._currentLocalID) {
-              // get the matrix values of the displayobject based on its transform properties..
-              lt.a = this._cx * this.scale.x;
-              lt.b = this._sx * this.scale.x;
-              lt.c = this._cy * this.scale.y;
-              lt.d = this._sy * this.scale.y;
-              lt.tx = this.position.x - ((this.pivot.x * lt.a) + (this.pivot.y * lt.c));
-              lt.ty = this.position.y - ((this.pivot.x * lt.b) + (this.pivot.y * lt.d));
-              this._currentLocalID = this._localID;
-              // force an update..
-              this._parentID = -1;
-          }
-      };
-      /**
-       * Updates the local and the world transformation matrices.
-       *
-       * @param {PIXI.Transform} parentTransform - The parent transform
-       */
-      Transform.prototype.updateTransform = function (parentTransform) {
-          var lt = this.localTransform;
-          if (this._localID !== this._currentLocalID) {
-              // get the matrix values of the displayobject based on its transform properties..
-              lt.a = this._cx * this.scale.x;
-              lt.b = this._sx * this.scale.x;
-              lt.c = this._cy * this.scale.y;
-              lt.d = this._sy * this.scale.y;
-              lt.tx = this.position.x - ((this.pivot.x * lt.a) + (this.pivot.y * lt.c));
-              lt.ty = this.position.y - ((this.pivot.x * lt.b) + (this.pivot.y * lt.d));
-              this._currentLocalID = this._localID;
-              // force an update..
-              this._parentID = -1;
-          }
-          if (this._parentID !== parentTransform._worldID) {
-              // concat the parent matrix with the objects transform.
-              var pt = parentTransform.worldTransform;
-              var wt = this.worldTransform;
-              wt.a = (lt.a * pt.a) + (lt.b * pt.c);
-              wt.b = (lt.a * pt.b) + (lt.b * pt.d);
-              wt.c = (lt.c * pt.a) + (lt.d * pt.c);
-              wt.d = (lt.c * pt.b) + (lt.d * pt.d);
-              wt.tx = (lt.tx * pt.a) + (lt.ty * pt.c) + pt.tx;
-              wt.ty = (lt.tx * pt.b) + (lt.ty * pt.d) + pt.ty;
-              this._parentID = parentTransform._worldID;
-              // update the id of the transform..
-              this._worldID++;
-          }
-      };
-      /**
-       * Decomposes a matrix and sets the transforms properties based on it.
-       *
-       * @param {PIXI.Matrix} matrix - The matrix to decompose
-       */
-      Transform.prototype.setFromMatrix = function (matrix) {
-          matrix.decompose(this);
-          this._localID++;
-      };
-      Object.defineProperty(Transform.prototype, "rotation", {
-          /**
-           * The rotation of the object in radians.
-           *
-           * @member {number}
-           */
-          get: function () {
-              return this._rotation;
-          },
-          set: function (value) {
-              if (this._rotation !== value) {
-                  this._rotation = value;
-                  this.updateSkew();
-              }
-          },
-          enumerable: false,
-          configurable: true
-      });
-      /**
-       * A default (identity) transform
-       *
-       * @static
-       * @constant
-       * @member {PIXI.Transform}
-       */
-      Transform.IDENTITY = new Transform();
-      return Transform;
-  })());
-
   /* eslint-disable */
 
-  const tempRect = new Rectangle();
-
-  /**
-   * The culling options for {@code Cull}.
-   *
-   * @ignore
-   * @public
-   */
-
-
-
-
-
-
+  var tempRect = new PIXI.Rectangle();
   /**
    * Provides a simple, configurable mechanism for culling a subtree of your scene graph.
    *
@@ -5107,95 +3762,72 @@
    *
    * @public
    */
-  class Cull
-  {
-      
-      
-      
-
+  var Cull = /** @class */ (function () {
       /**
        * @param options
        * @param [options.recursive] - whether culling should be recursive
        * @param [options.toggle='renderable'] - which property of display-object was be set to indicate
        *      its culling state. It should be one of `renderable`, `visible`.
        */
-      constructor(options = {})
-      {
+      function Cull(options) {
+          if (options === void 0) { options = {}; }
           this._recursive = typeof options.recursive === 'boolean' ? options.recursive : true;
           this._toggle = options.toggle || 'visible';
           this._targetList = new Set();
       }
-
       /**
        * Adds a display-object to the culling list
        *
        * @param target - the display-object to be culled
        * @return this
        */
-      add(target)
-      {
+      Cull.prototype.add = function (target) {
           this._targetList.add(target);
-
           return this;
-      }
-
+      };
       /**
        * Adds all the display-objects to the culling list
        *
        * @param targets - the display-objects to be culled
        * @return this
        */
-      addAll(targets)
-      {
-          for (let i = 0, j = targets.length; i < j; i++)
-          {
+      Cull.prototype.addAll = function (targets) {
+          for (var i = 0, j = targets.length; i < j; i++) {
               this._targetList.add(targets[i]);
           }
-
           return this;
-      }
-
+      };
       /**
        * Removes the display-object from the culling list
        *
        * @param target - the display-object to be removed
        * @return this
        */
-      remove(target)
-      {
+      Cull.prototype.remove = function (target) {
           this._targetList.delete(target);
-
           return this;
-      }
-
+      };
       /**
        * Removes all the passed display-objects from the culling list
        *
        * @param targets - the display-objects to be removed
        * @return this
        */
-      removeAll(targets)
-      {
-          for (let i = 0, j = targets.length; i < j; i++)
-          {
+      Cull.prototype.removeAll = function (targets) {
+          for (var i = 0, j = targets.length; i < j; i++) {
               this._targetList.delete(targets[i]);
           }
-
           return this;
-      }
-
+      };
       /**
        * Clears the culling list
        *
        * @return this
        */
-      clear()
-      {
+      Cull.prototype.clear = function () {
           this._targetList.clear();
-
           return this;
-      }
-
+      };
       /**
        * @param rect - the rectangle outside of which display-objects should be culled
        * @param skipUpdate - whether to skip unculling, transform update, bounds calculation. It is
@@ -5203,43 +3835,33 @@
        *  before your render loop.
        * @return this
        */
-      cull(rect, skipUpdate = false)
-      {
-          if (!skipUpdate)
-          {
+      Cull.prototype.cull = function (rect, skipUpdate) {
+          var _this = this;
+          if (skipUpdate === void 0) { skipUpdate = false; }
+          if (!skipUpdate) {
               this.uncull();
           }
-
-          this._targetList.forEach((target) =>
-          {
-              if (!skipUpdate)
-              {
+          this._targetList.forEach(function (target) {
+              if (!skipUpdate) {
                   // Update transforms, bounds of display-objects in this target's subtree
                   target.getBounds(false, tempRect);
               }
-
-              if (this._recursive)
-              {
-                  this.cullRecursive(rect, target, skipUpdate);
+              if (_this._recursive) {
+                  _this.cullRecursive(rect, target, skipUpdate);
               }
-              else
-              {
+              else {
                   // NOTE: If skipUpdate is false, then tempRect already contains the bounds of the target
-                  if (skipUpdate)
-                  {
+                  if (skipUpdate) {
                       target._bounds.getRectangle(rect);
                   }
-
-                  target[this._toggle] = tempRect.right > rect.left
+                  target[_this._toggle] = tempRect.right > rect.left
                       && tempRect.left < rect.right
                       && tempRect.bottom > rect.top
                       && tempRect.top < rect.bottom;
               }
           });
-
           return this;
-      }
-
+      };
       /**
        * Sets all display-objects to the unculled state.
        *
@@ -5248,23 +3870,18 @@
        *
        * @return this
        */
-      uncull()
-      {
-          this._targetList.forEach((target) =>
-          {
-              if (this._recursive)
-              {
-                  this.uncullRecursive(target);
+      Cull.prototype.uncull = function () {
+          var _this = this;
+          this._targetList.forEach(function (target) {
+              if (_this._recursive) {
+                  _this.uncullRecursive(target);
               }
-              else
-              {
-                  target[this._toggle] = false;
+              else {
+                  target[_this._toggle] = false;
               }
           });
-
           return this;
-      }
-
+      };
       /**
        * Recursively culls the subtree of {@code displayObject}.
        *
@@ -5272,73 +3889,61 @@
        * @param displayObject - the root of the subtree to cull
        * @param skipUpdate - whether to skip bounds calculation. However, transforms are expected to be updated by the caller.
        */
-       cullRecursive(rect, displayObject, skipUpdate)
-      {
+      Cull.prototype.cullRecursive = function (rect, displayObject, skipUpdate) {
           // NOTE: getBounds can skipUpdate because updateTransform is invoked before culling.
-          const bounds = skipUpdate
+          var bounds = skipUpdate
               ? displayObject._bounds.getRectangle(tempRect)
               : displayObject.getBounds(true, tempRect);
-
           displayObject[this._toggle] = bounds.right > rect.left
               && bounds.left < rect.right
               && bounds.bottom > rect.top
               && bounds.top < rect.bottom;
-
-          const fullyVisible = bounds.left >= rect.left
+          var fullyVisible = bounds.left >= rect.left
               && bounds.top >= rect.top
               && bounds.right <= rect.right
-              && bounds.bottom <= rect.bottom;
-
+              && bounds.bottom >= rect.bottom;
           // Only cull children if this display-object is *not* fully-visible. It is expected that the bounds
           // of children lie inside of its own. Hence, further culling is only required if the display-object
           // intersects with the boundaries of "rect". Otherwise, if the object is fully outside/inside the
           // screen, the children don't need to be evaluated as they are presumed to be unculled.
           if (!fullyVisible
-                  && displayObject[this._toggle]
-                  && (displayObject ).children
-                  && (displayObject ).children.length)
-          {
-              const children = (displayObject ).children;
-
-              for (let i = 0, j = children.length; i < j; i++)
-              {
+              && displayObject[this._toggle]
+              && displayObject.children
+              && displayObject.children.length) {
+              var children = displayObject.children;
+              for (var i = 0, j = children.length; i < j; i++) {
                   this.cullRecursive(rect, children[i]);
               }
           }
-      }
-
+      };
       /**
        * Recursively unculls the subtree of {@code displayObject}.
        *
        * @param displayObject
        */
-       uncullRecursive(displayObject)
-      {
+      Cull.prototype.uncullRecursive = function (displayObject) {
           displayObject[this._toggle] = true;
-
-          if ((displayObject ).children && (displayObject ).children.length)
-          {
-              const children = (displayObject ).children;
-
-              for (let i = 0, j = children.length; i < j; i++)
-              {
+          if (displayObject.children && displayObject.children.length) {
+              var children = displayObject.children;
+              for (var i = 0, j = children.length; i < j; i++) {
                   this.uncullRecursive(children[i]);
               }
           }
-      }
-  }
+      };
+      return Cull;
+  }());
 
-  function createCommonjsModule(fn, basedir, module) {
+  function createCommonjsModule$1(fn, basedir, module) {
   	return module = {
   		path: basedir,
   		exports: {},
   		require: function (path, base) {
-  			return commonjsRequire(path, (base === undefined || base === null) ? module.path : base);
+  			return commonjsRequire$1(path, (base === undefined || base === null) ? module.path : base);
   		}
   	}, fn(module, module.exports), module.exports;
   }
 
-  function commonjsRequire () {
+  function commonjsRequire$1 () {
   	throw new Error('Dynamic requires are not currently supported by @rollup/plugin-commonjs');
   }
 
@@ -5771,55 +4376,34 @@
 
   function once(emitter, name) {
     return new Promise(function (resolve, reject) {
-      function errorListener(err) {
-        emitter.removeListener(name, resolver);
-        reject(err);
-      }
-
-      function resolver() {
-        if (typeof emitter.removeListener === 'function') {
+      function eventListener() {
+        if (errorListener !== undefined) {
           emitter.removeListener('error', errorListener);
         }
         resolve([].slice.call(arguments));
-      }
-      eventTargetAgnosticAddListener(emitter, name, resolver, { once: true });
+      }    var errorListener;
+
+      // Adding an error listener is not optional because
+      // if an error is thrown on an event emitter we cannot
+      // guarantee that the actual event we are waiting will
+      // be fired. The result could be a silent way to create
+      // memory or file descriptor leaks, which is something
+      // we should avoid.
       if (name !== 'error') {
-        addErrorHandlerIfEventEmitter(emitter, errorListener, { once: true });
+        errorListener = function errorListener(err) {
+          emitter.removeListener(name, eventListener);
+          reject(err);
+        };
+
+        emitter.once('error', errorListener);
       }
+
+      emitter.once(name, eventListener);
     });
-  }
-
-  function addErrorHandlerIfEventEmitter(emitter, handler, flags) {
-    if (typeof emitter.on === 'function') {
-      eventTargetAgnosticAddListener(emitter, 'error', handler, flags);
-    }
-  }
-
-  function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
-    if (typeof emitter.on === 'function') {
-      if (flags.once) {
-        emitter.once(name, listener);
-      } else {
-        emitter.on(name, listener);
-      }
-    } else if (typeof emitter.addEventListener === 'function') {
-      // EventTarget does not have `error` event semantics like Node
-      // EventEmitters, we do not listen for `error` events here.
-      emitter.addEventListener(name, function wrapListener(arg) {
-        // IE does not have builtin `{ once: true }` support so we
-        // have to do it manually.
-        if (flags.once) {
-          emitter.removeEventListener(name, wrapListener);
-        }
-        listener(arg);
-      });
-    } else {
-      throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof emitter);
-    }
   }
   events.once = once_1;
 
-  var lib = createCommonjsModule(function (module, exports) {
+  var lib = createCommonjsModule$1(function (module, exports) {
   Object.defineProperty(exports, "__esModule", { value: true });
   exports.TypedEmitter = events.EventEmitter;
   });
@@ -5988,8 +4572,8 @@
           if (!texture) {
               var container = defaultCallback();
               var region = container.getLocalBounds(undefined, true);
-              var roundedRegion = new PIXI__namespace.Rectangle(Math.floor(region.x), Math.floor(region.y), Math.ceil(region.width), Math.ceil(region.height));
-              texture = this.app.renderer.generateTexture(container, PIXI__namespace.SCALE_MODES.LINEAR, this.app.renderer.resolution, roundedRegion);
+              var roundedRegion = new PIXI.Rectangle(Math.floor(region.x), Math.floor(region.y), Math.ceil(region.width), Math.ceil(region.height));
+              texture = this.app.renderer.generateTexture(container, PIXI.SCALE_MODES.LINEAR, this.app.renderer.resolution, roundedRegion);
               this.textures.set(key, texture);
           }
           return texture;
@@ -6419,31 +5003,31 @@
       if (!rgbaColor) {
           throw new Error("Invalid color " + color);
       }
-      var pixiColor = PIXI__namespace.utils.rgb2hex([rgbaColor[0] / 255, rgbaColor[1] / 255, rgbaColor[2] / 255]);
+      var pixiColor = PIXI.utils.rgb2hex([rgbaColor[0] / 255, rgbaColor[1] / 255, rgbaColor[2] / 255]);
       var alpha = rgbaColor[3];
       return [pixiColor, alpha];
   }
 
-  var DELIMETER$1 = '::';
-  var WHITE = 0xffffff;
+  var DELIMETER = '::';
+  var WHITE$1 = 0xffffff;
   var NODE_CIRCLE = 'NODE_CIRCLE';
   var NODE_CIRCLE_BORDER = 'NODE_CIRCLE_BORDER';
   var NODE_ICON = 'NODE_ICON';
   function createNode(nodeGfx) {
       // nodeGfx
-      nodeGfx.hitArea = new PIXI__namespace.Circle(0, 0);
+      nodeGfx.hitArea = new PIXI.Circle(0, 0);
       // nodeGfx -> nodeCircle
-      var nodeCircle = new PIXI__namespace.Sprite();
+      var nodeCircle = new PIXI.Sprite();
       nodeCircle.name = NODE_CIRCLE;
       nodeCircle.anchor.set(0.5);
       nodeGfx.addChild(nodeCircle);
       // nodeGfx -> nodeCircleBorder
-      var nodeCircleBorder = new PIXI__namespace.Sprite();
+      var nodeCircleBorder = new PIXI.Sprite();
       nodeCircleBorder.name = NODE_CIRCLE_BORDER;
       nodeCircleBorder.anchor.set(0.5);
       nodeGfx.addChild(nodeCircleBorder);
       // nodeGfx -> nodeIcon
-      var nodeIcon = new PIXI__namespace.Sprite();
+      var nodeIcon = new PIXI.Sprite();
       nodeIcon.name = NODE_ICON;
       nodeIcon.anchor.set(0.5);
       nodeGfx.addChild(nodeIcon);
@@ -6451,21 +5035,21 @@
   function updateNodeStyle(nodeGfx, nodeStyle, textureCache) {
       var _a, _b, _c;
       var nodeOuterSize = nodeStyle.size + nodeStyle.border.width;
-      var nodeCircleTextureKey = [NODE_CIRCLE, nodeStyle.size].join(DELIMETER$1);
+      var nodeCircleTextureKey = [NODE_CIRCLE, nodeStyle.size].join(DELIMETER);
       var nodeCircleTexture = textureCache.get(nodeCircleTextureKey, function () {
-          var graphics = new PIXI__namespace.Graphics();
-          graphics.beginFill(WHITE);
+          var graphics = new PIXI.Graphics();
+          graphics.beginFill(WHITE$1);
           graphics.drawCircle(nodeStyle.size, nodeStyle.size, nodeStyle.size);
           return graphics;
       });
-      var nodeCircleBorderTextureKey = [NODE_CIRCLE_BORDER, nodeStyle.size, nodeStyle.border.width].join(DELIMETER$1);
+      var nodeCircleBorderTextureKey = [NODE_CIRCLE_BORDER, nodeStyle.size, nodeStyle.border.width].join(DELIMETER);
       var nodeCircleBorderTexture = textureCache.get(nodeCircleBorderTextureKey, function () {
-          var graphics = new PIXI__namespace.Graphics();
-          graphics.lineStyle(nodeStyle.border.width, WHITE);
+          var graphics = new PIXI.Graphics();
+          graphics.lineStyle(nodeStyle.border.width, WHITE$1);
           graphics.drawCircle(nodeOuterSize, nodeOuterSize, nodeStyle.size);
           return graphics;
       });
-      var nodeIconTextureKey = [NODE_ICON, nodeStyle.icon.fontFamily, nodeStyle.icon.fontSize, nodeStyle.icon.content].join(DELIMETER$1);
+      var nodeIconTextureKey = [NODE_ICON, nodeStyle.icon.fontFamily, nodeStyle.icon.fontSize, nodeStyle.icon.content].join(DELIMETER);
       var nodeIconTexture = textureCache.get(nodeIconTextureKey, function () {
           var text = textToPixi(nodeStyle.icon.type, nodeStyle.icon.content, {
               fontFamily: nodeStyle.icon.fontFamily,
@@ -6498,17 +5082,17 @@
       nodeIcon.visible = nodeIcon.visible && zoomStep >= 2;
   }
 
-  var DELIMETER = '::';
+  var DELIMETER$1 = '::';
   var NODE_LABEL_BACKGROUND = 'NODE_LABEL_BACKGROUND';
   var NODE_LABEL_TEXT = 'NODE_LABEL_TEXT';
   function createNodeLabel(nodeLabelGfx) {
       // nodeLabelGfx -> nodeLabelBackground
-      var nodeLabelBackground = new PIXI__namespace.Sprite(PIXI__namespace.Texture.WHITE);
+      var nodeLabelBackground = new PIXI.Sprite(PIXI.Texture.WHITE);
       nodeLabelBackground.name = NODE_LABEL_BACKGROUND;
       nodeLabelBackground.anchor.set(0.5);
       nodeLabelGfx.addChild(nodeLabelBackground);
       // nodeLabelGfx -> nodeLabelText
-      var nodeLabelText = new PIXI__namespace.Sprite();
+      var nodeLabelText = new PIXI.Sprite();
       nodeLabelText.name = NODE_LABEL_TEXT;
       nodeLabelText.anchor.set(0.5);
       nodeLabelGfx.addChild(nodeLabelText);
@@ -6516,7 +5100,7 @@
   function updateNodeLabelStyle(nodeLabelGfx, nodeStyle, textureCache) {
       var _a, _b;
       var nodeOuterSize = nodeStyle.size + nodeStyle.border.width;
-      var nodeLabelTextTextureKey = [NODE_LABEL_TEXT, nodeStyle.label.fontFamily, nodeStyle.label.fontSize, nodeStyle.label.content].join(DELIMETER);
+      var nodeLabelTextTextureKey = [NODE_LABEL_TEXT, nodeStyle.label.fontFamily, nodeStyle.label.fontSize, nodeStyle.label.content].join(DELIMETER$1);
       var nodeLabelTextTexture = textureCache.get(nodeLabelTextTextureKey, function () {
           var text = textToPixi(nodeStyle.label.type, nodeStyle.label.content, {
               fontFamily: nodeStyle.label.fontFamily,
@@ -6552,13 +5136,13 @@
           _this.hovered = false;
           _this.nodeGfx = _this.createNode();
           _this.nodeLabelGfx = _this.createNodeLabel();
-          _this.nodePlaceholderGfx = new PIXI__namespace.Container();
-          _this.nodeLabelPlaceholderGfx = new PIXI__namespace.Container();
+          _this.nodePlaceholderGfx = new PIXI.Container();
+          _this.nodeLabelPlaceholderGfx = new PIXI.Container();
           return _this;
       }
       PixiNode.prototype.createNode = function () {
           var _this = this;
-          var nodeGfx = new PIXI__namespace.Container();
+          var nodeGfx = new PIXI.Container();
           nodeGfx.interactive = true;
           nodeGfx.buttonMode = true;
           nodeGfx.on('mousemove', function (event) { return _this.emit('mousemove', event.data.originalEvent); });
@@ -6571,7 +5155,7 @@
       };
       PixiNode.prototype.createNodeLabel = function () {
           var _this = this;
-          var nodeLabelGfx = new PIXI__namespace.Container();
+          var nodeLabelGfx = new PIXI.Container();
           nodeLabelGfx.interactive = true;
           nodeLabelGfx.buttonMode = true;
           nodeLabelGfx.on('mousemove', function (event) { return _this.emit('mousemove', event.data.originalEvent); });
@@ -6600,7 +5184,7 @@
   var EDGE_LINE = 'EDGE_LINE';
   function createEdge(edgeGfx) {
       // edgeGfx -> edgeLine
-      var edgeLine = new PIXI__namespace.Sprite(PIXI__namespace.Texture.WHITE);
+      var edgeLine = new PIXI.Sprite(PIXI.Texture.WHITE);
       edgeLine.name = EDGE_LINE;
       edgeLine.anchor.set(0.5);
       edgeGfx.addChild(edgeLine);
@@ -6624,12 +5208,12 @@
           var _this = _super.call(this) || this;
           _this.hovered = false;
           _this.edgeGfx = _this.createEdge();
-          _this.edgePlaceholderGfx = new PIXI__namespace.Container();
+          _this.edgePlaceholderGfx = new PIXI.Container();
           return _this;
       }
       PixiEdge.prototype.createEdge = function () {
           var _this = this;
-          var edgeGfx = new PIXI__namespace.Container();
+          var edgeGfx = new PIXI.Container();
           edgeGfx.interactive = true;
           edgeGfx.buttonMode = true;
           edgeGfx.on('mousemove', function (event) { return _this.emit('mousemove', event.data.originalEvent); });
@@ -6714,12 +5298,12 @@
           _this.hoverStyle = options.hoverStyle;
           _this.resources = options.resources;
           _this.nodeDragging = typeof options.nodeDragging === 'boolean' ? options.nodeDragging : true;
-          PIXI__namespace.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
+          PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
           if (!(_this.container instanceof HTMLElement)) {
               throw new Error('container should be a HTMLElement');
           }
           // create PIXI application
-          _this.app = new PIXI__namespace.Application({
+          _this.app = new PIXI.Application({
               resizeTo: _this.container,
               resolution: window.devicePixelRatio,
               transparent: true,
@@ -6743,12 +5327,12 @@
               .clampZoom({ maxScale: 1 });
           _this.app.stage.addChild(_this.viewport);
           // create layers
-          _this.edgeLayer = new PIXI__namespace.Container();
-          _this.frontEdgeLayer = new PIXI__namespace.Container();
-          _this.nodeLayer = new PIXI__namespace.Container();
-          _this.nodeLabelLayer = new PIXI__namespace.Container();
-          _this.frontNodeLayer = new PIXI__namespace.Container();
-          _this.frontNodeLabelLayer = new PIXI__namespace.Container();
+          _this.edgeLayer = new PIXI.Container();
+          _this.frontEdgeLayer = new PIXI.Container();
+          _this.nodeLayer = new PIXI.Container();
+          _this.nodeLabelLayer = new PIXI.Container();
+          _this.frontNodeLayer = new PIXI.Container();
+          _this.frontNodeLabelLayer = new PIXI.Container();
           _this.viewport.addChild(_this.edgeLayer);
           _this.viewport.addChild(_this.frontEdgeLayer);
           _this.viewport.addChild(_this.nodeLayer);
@@ -6830,7 +5414,7 @@
           var maxY = Math.max.apply(Math, nodesY);
           var graphWidth = Math.abs(maxX - minX);
           var graphHeight = Math.abs(maxY - minY);
-          var graphCenter = new PIXI__namespace.Point(minX + graphWidth / 2, minY + graphHeight / 2);
+          var graphCenter = new PIXI.Point(minX + graphWidth / 2, minY + graphHeight / 2);
           var worldWidth = graphWidth + WORLD_PADDING * 2;
           var worldHeight = graphHeight + WORLD_PADDING * 2;
           // TODO: update worldWidth/worldHeight when graph is updated?
@@ -6963,7 +5547,7 @@
           document.addEventListener('mousemove', this.onDocumentMouseMoveBound);
       };
       PixiGraph.prototype.onDocumentMouseMove = function (event) {
-          var eventPosition = new PIXI__namespace.Point(event.offsetX, event.offsetY);
+          var eventPosition = new PIXI.Point(event.offsetX, event.offsetY);
           var worldPosition = this.viewport.toWorld(eventPosition);
           if (this.mousedownNodeKey) {
               this.moveNode(this.mousedownNodeKey, worldPosition);
@@ -6982,7 +5566,11 @@
       PixiGraph.prototype.createNode = function (nodeKey, nodeAttributes) {
           var _this = this;
           var node = new PixiNode();
+          var mouseMoved = false;
           node.on('mousemove', function (event) {
+              if (_this.mousedownNodeKey === nodeKey) {
+                  mouseMoved = true;
+              }
               _this.emit('nodeMousemove', event, nodeKey);
           });
           node.on('mouseover', function (event) {
@@ -6998,6 +5586,7 @@
               _this.emit('nodeMouseout', event, nodeKey);
           });
           node.on('mousedown', function (event) {
+              mouseMoved = false;
               _this.mousedownNodeKey = nodeKey;
               if (_this.nodeDragging) {
                   _this.enableNodeDragging();
@@ -7008,7 +5597,7 @@
           node.on('mouseup', function (event) {
               _this.emit('nodeMouseup', event, nodeKey);
               // why native click event doesn't work?
-              if (_this.mousedownNodeKey === nodeKey) {
+              if (_this.mousedownNodeKey === nodeKey && !mouseMoved) {
                   _this.emit('nodeClick', event, nodeKey);
               }
           });
