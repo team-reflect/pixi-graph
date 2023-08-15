@@ -6,7 +6,7 @@
 
 Graph visualization library using [PIXI.js](https://www.pixijs.com/) and [Graphology](https://graphology.github.io/).
 
-⚠️ **This is a pre-release, use at your own risk!** Upcoming features can introduce breaking changes in the API.
+⚠️ **The repository is archived as read-only. Feel free to continue in your own fork.**
 
 Developing a full-featured graph visualization library is a significant effort. I'd appreciate your feedback to prioritize new features by filling in a [survey](https://link.zakjan.cz/pixi-graph-survey).
 
@@ -17,15 +17,14 @@ Developing a full-featured graph visualization library is a significant effort. 
 ## Install
 
 ```
-npm install graphology pixi.js pixi-graph
+npm install graphology pixi-graph
 ```
 
 or
 
 ```html
 <script src="https://unpkg.com/graphology@0.18.0/dist/graphology.umd.js"></script>
-<script src="https://unpkg.com/pixi.js@5.3.3/dist/pixi.min.js"></script>
-<script src="https://unpkg.com/pixi-graph@1.2.1/dist/pixi-graph.umd.min.js"></script>
+<script src="https://unpkg.com/pixi-graph@1.3.1/dist/pixi-graph.umd.min.js"></script>
 ```
 
 ## Usage
@@ -38,8 +37,8 @@ const graph = new graphology.Graph();
 // assign layout positions as `x`, `y` node attributes
 
 const pixiGraph = new PixiGraph.PixiGraph({
-  container: document.getElementById('graph'),
-  graph
+  container: document.getElementById("graph"),
+  graph,
 });
 ```
 
@@ -88,7 +87,10 @@ Preload fonts before creating PixiGraph with [FontFaceObserver](https://github.c
 [Material Icons](https://google.github.io/material-design-icons/) example:
 
 ```html
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  rel="stylesheet"
+/>
 ```
 
 ```ts
@@ -158,16 +160,22 @@ const pixiGraph = new PixiGraph.PixiGraph({ ..., style, hoverStyle });
 ## API
 
 ```ts
-export interface GraphOptions<NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes, EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes> {
+export interface GraphOptions<
+  NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes,
+  EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes
+> {
   container: HTMLElement;
-  graph: Graphology.AbstractGraph<NodeAttributes, EdgeAttributes>;
+  graph: AbstractGraph<NodeAttributes, EdgeAttributes>;
   style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   resources?: ResourceLoader.IAddOptions[];
   nodeDragging?: boolean;
 }
 
-export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes, EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes> {
+export class PixiGraph<
+  NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes,
+  EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes
+> {
   constructor(options: GraphOptions<NodeAttributes, EdgeAttributes>);
 }
 ```
@@ -220,15 +228,18 @@ export interface GraphStyle {
   };
 }
 
-export type NodeStyle = GraphStyle['node'];
-export type EdgeStyle = GraphStyle['edge'];
+export type NodeStyle = GraphStyle["node"];
+export type EdgeStyle = GraphStyle["edge"];
 
 export type StyleDefinition<Style, Attributes> =
-  ((attributes: Attributes) => Style) |
-  {[Key in keyof Style]?: StyleDefinition<Style[Key], Attributes>} |
-  Style;
+  | ((attributes: Attributes) => Style)
+  | { [Key in keyof Style]?: StyleDefinition<Style[Key], Attributes> }
+  | Style;
 
-export interface GraphStyleDefinition<NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes, EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes> {
+export interface GraphStyleDefinition<
+  NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes,
+  EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes
+> {
   node?: StyleDefinition<NodeStyle, NodeAttributes>;
   edge?: StyleDefinition<EdgeStyle, EdgeAttributes>;
 }
@@ -239,7 +250,7 @@ This allows either static styles, or data-driven styles at any style definition 
 ```ts
 const style = {
   node: {
-    color: '#000000',
+    color: "#000000",
   },
 };
 ```
@@ -249,7 +260,7 @@ or
 ```ts
 const style = {
   node: {
-    color: node => colors[node.group % colors.length],
+    color: (node) => colors[node.group % colors.length],
   },
 };
 ```
@@ -258,7 +269,7 @@ or
 
 ```ts
 const style = {
-  node: node => {
+  node: (node) => {
     const color = colors[node.group % colors.length];
     return { color };
   },
