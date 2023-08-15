@@ -1,29 +1,33 @@
-import { Application } from "@pixi/app";
-import { TickerPlugin } from "@pixi/ticker";
-import { AppLoaderPlugin, Loader } from "@pixi/loaders";
-import { BitmapFontLoader } from "@pixi/text-bitmap";
-import { Renderer, BatchRenderer } from "@pixi/core";
-import { InteractionManager } from "@pixi/interaction";
-import { Container } from "@pixi/display";
-import { Point, IPointData } from "@pixi/math";
-import { IAddOptions } from "@pixi/loaders";
-import { Viewport } from "pixi-viewport";
 import { Cull } from "@pixi-essentials/cull";
+import { Application } from "@pixi/app";
+import { BatchRenderer, extensions, settings } from "@pixi/core";
+import { Container } from "@pixi/display";
+import { InteractionManager } from "@pixi/interaction";
+import { AppLoaderPlugin, IAddOptions } from "@pixi/loaders";
+import { IPointData, Point } from "@pixi/math";
+import { loadBitmapFont } from "@pixi/text-bitmap";
+import { TickerPlugin } from "@pixi/ticker";
 import { AbstractGraph } from "graphology-types";
+import { Viewport } from "pixi-viewport";
 import { TypedEmitter } from "tiny-typed-emitter";
+import { BaseEdgeAttributes, BaseNodeAttributes } from "./attributes";
+import { PixiEdge } from "./edge";
+import { PixiNode } from "./node";
+import { TextureCache } from "./texture-cache";
 import { GraphStyleDefinition, resolveStyleDefinitions } from "./utils/style";
 import { TextType } from "./utils/text";
-import { BaseNodeAttributes, BaseEdgeAttributes } from "./attributes";
-import { TextureCache } from "./texture-cache";
-import { PixiNode } from "./node";
-import { PixiEdge } from "./edge";
-import { LINE_SCALE_MODE, settings } from "@pixi/graphics-smooth";
+import {
+  LINE_SCALE_MODE,
+  settings as graphicsSettings,
+} from "@pixi/graphics-smooth";
 
-Application.registerPlugin(TickerPlugin);
-Application.registerPlugin(AppLoaderPlugin);
-Loader.registerPlugin(BitmapFontLoader);
-Renderer.registerPlugin("batch", BatchRenderer);
-Renderer.registerPlugin("interaction", InteractionManager);
+extensions.add(
+  TickerPlugin,
+  AppLoaderPlugin,
+  loadBitmapFont,
+  BatchRenderer,
+  InteractionManager
+);
 
 const DEFAULT_STYLE: GraphStyleDefinition = {
   node: {
@@ -140,19 +144,19 @@ export class PixiGraph<
     this.nodeDragging =
       typeof options.nodeDragging === "boolean" ? options.nodeDragging : true;
 
-    PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
+    settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false;
 
     if (!(this.container instanceof HTMLElement)) {
       throw new Error("container should be a HTMLElement");
     }
 
-    settings.LINE_SCALE_MODE = LINE_SCALE_MODE.NORMAL;
+    graphicsSettings.LINE_SCALE_MODE = LINE_SCALE_MODE.NORMAL;
 
     // create PIXI application
     this.app = new Application({
       resizeTo: this.container,
       resolution: window.devicePixelRatio,
-      transparent: true,
+      // transparent: true,
       antialias: true,
       autoDensity: true,
     });
