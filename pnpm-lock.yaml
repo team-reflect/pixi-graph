@@ -20,6 +20,9 @@ dependencies:
   '@pixi/display':
     specifier: ^6.5.10
     version: 6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10)(@pixi/utils@6.5.10)
+  '@pixi/extensions':
+    specifier: ^6.5.10
+    version: 6.5.10
   '@pixi/graphics':
     specifier: ^6.5.10
     version: 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10)(@pixi/display@6.5.10)(@pixi/math@6.5.10)(@pixi/sprite@6.5.10)(@pixi/utils@6.5.10)
@@ -35,9 +38,18 @@ dependencies:
   '@pixi/math':
     specifier: ^6.5.10
     version: 6.5.10
+  '@pixi/mesh':
+    specifier: ^6.5.10
+    version: 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10)(@pixi/display@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10)(@pixi/utils@6.5.10)
   '@pixi/mixin-get-child-by-name':
     specifier: ^6.5.10
     version: 6.5.10(@pixi/display@6.5.10)
+  '@pixi/runner':
+    specifier: ^6.5.10
+    version: 6.5.10
+  '@pixi/settings':
+    specifier: ^6.5.10
+    version: 6.5.10(@pixi/constants@6.5.10)
   '@pixi/sprite':
     specifier: ^6.5.10
     version: 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10)(@pixi/display@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10)(@pixi/utils@6.5.10)
@@ -406,7 +418,6 @@ packages:
 
   /@pixi/graphics-smooth@0.0.30(@pixi/constants@6.5.10)(@pixi/core@6.5.10)(@pixi/display@6.5.10)(@pixi/graphics@6.5.10)(@pixi/math@6.5.10)(@pixi/utils@6.5.10):
     resolution: {integrity: sha512-9W/MBrjL5crqA7fEQHynvwXA15CiU9/SqWokr+SGMqsij1NepNLADDFXErScC2uBtt3ud407goBFA9PNXGmDkg==}
-    engines: {node: '>=14', npm: '>=7'}
     peerDependencies:
       '@pixi/constants': ^6.0.4
       '@pixi/core': ^6.0.4
