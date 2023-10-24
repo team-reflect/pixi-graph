@@ -6,7 +6,7 @@
 
 Graph visualization library using [PIXI.js](https://www.pixijs.com/) and [Graphology](https://graphology.github.io/).
 
-⚠️ **This is a pre-release, use at your own risk!** Upcoming features can introduce breaking changes in the API.
+⚠️ **The repository is archived as read-only. Feel free to continue in your own fork.**
 
 Developing a full-featured graph visualization library is a significant effort. I'd appreciate your feedback to prioritize new features by filling in a [survey](https://link.zakjan.cz/pixi-graph-survey).
 
@@ -17,15 +17,14 @@ Developing a full-featured graph visualization library is a significant effort. 
 ## Install
 
 ```
-npm install graphology pixi.js pixi-graph
+npm install graphology pixi-graph
 ```
 
 or
 
 ```html
 <script src="https://unpkg.com/graphology@0.18.0/dist/graphology.umd.js"></script>
-<script src="https://unpkg.com/pixi.js@5.3.3/dist/pixi.min.js"></script>
-<script src="https://unpkg.com/pixi-graph@1.2.1/dist/pixi-graph.umd.min.js"></script>
+<script src="https://unpkg.com/pixi-graph@1.3.1/dist/pixi-graph.umd.min.js"></script>
 ```
 
 ## Usage
@@ -160,10 +159,10 @@ const pixiGraph = new PixiGraph.PixiGraph({ ..., style, hoverStyle });
 ```ts
 export interface GraphOptions<NodeAttributes extends BaseNodeAttributes = BaseNodeAttributes, EdgeAttributes extends BaseEdgeAttributes = BaseEdgeAttributes> {
   container: HTMLElement;
-  graph: Graphology.AbstractGraph<NodeAttributes, EdgeAttributes>;
+  graph: AbstractGraph<NodeAttributes, EdgeAttributes>;
   style: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
   hoverStyle: GraphStyleDefinition<NodeAttributes, EdgeAttributes>;
-  resources?: ResourceLoader.IAddOptions[];
+  resources?: IAddOptions[];
   nodeDragging?: boolean;
 }
 
