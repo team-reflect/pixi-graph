@@ -7,6 +7,7 @@ import { InteractionManager } from '@pixi/interaction';
 import { Container } from '@pixi/display';
 import { Point, IPointData } from '@pixi/math';
 import { IAddOptions } from '@pixi/loaders';
+import {settings as PixiSettings} from '@pixi/settings';
 import { Viewport } from 'pixi-viewport';
 import { Cull } from '@pixi-essentials/cull';
 import { AbstractGraph } from 'graphology-types';
@@ -17,7 +18,7 @@ import { BaseNodeAttributes, BaseEdgeAttributes } from './attributes';
 import { TextureCache } from './texture-cache';
 import { PixiNode } from './node';
 import { PixiEdge } from './edge';
-import { LINE_SCALE_MODE, settings } from '@pixi/graphics-smooth';
+import { LINE_SCALE_MODE, settings as PixiGraphicsSmoothSettings } from '@pixi/graphics-smooth';
 
 Application.registerPlugin(TickerPlugin);
 Application.registerPlugin(AppLoaderPlugin);
@@ -129,14 +130,13 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     this.resources = options.resources;
     this.nodeDragging = typeof options.nodeDragging === 'boolean' ? options.nodeDragging : true;
     
-    // @ts-expect-error: PIXI is not defined here 
-    PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false
+    PixiSettings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false
 
     if (!(this.container instanceof HTMLElement)) {
       throw new Error('container should be a HTMLElement');
     }
 
-    settings.LINE_SCALE_MODE = LINE_SCALE_MODE.NORMAL;
+    PixiGraphicsSmoothSettings.LINE_SCALE_MODE = LINE_SCALE_MODE.NORMAL;
 
     // create PIXI application
     this.app = new Application({
