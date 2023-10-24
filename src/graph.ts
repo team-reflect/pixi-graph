@@ -1,13 +1,13 @@
 import { Application } from '@pixi/app';
 import { TickerPlugin } from '@pixi/ticker';
-import { AppLoaderPlugin, Loader } from '@pixi/loaders';
+import { AppLoaderPlugin } from '@pixi/loaders';
 import { BitmapFontLoader } from '@pixi/text-bitmap';
-import { Renderer, BatchRenderer } from '@pixi/core';
+import { BatchRenderer, extensions } from '@pixi/core';
 import { InteractionManager } from '@pixi/interaction';
 import { Container } from '@pixi/display';
 import { Point, IPointData } from '@pixi/math';
 import { IAddOptions } from '@pixi/loaders';
-import {settings as PixiSettings} from '@pixi/settings';
+import { settings as PixiSettings } from '@pixi/settings';
 import { Viewport } from 'pixi-viewport';
 import { Cull } from '@pixi-essentials/cull';
 import { AbstractGraph } from 'graphology-types';
@@ -20,11 +20,13 @@ import { PixiNode } from './node';
 import { PixiEdge } from './edge';
 import { LINE_SCALE_MODE, settings as PixiGraphicsSmoothSettings } from '@pixi/graphics-smooth';
 
-Application.registerPlugin(TickerPlugin);
-Application.registerPlugin(AppLoaderPlugin);
-Loader.registerPlugin(BitmapFontLoader);
-Renderer.registerPlugin('batch', BatchRenderer);
-Renderer.registerPlugin('interaction', InteractionManager);
+extensions.add(
+  TickerPlugin,
+  AppLoaderPlugin,
+  BitmapFontLoader,
+  BatchRenderer,
+  InteractionManager,
+);
 
 const DEFAULT_STYLE: GraphStyleDefinition = {
   node: {
@@ -142,7 +144,7 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     this.app = new Application({
       resizeTo: this.container,
       resolution: window.devicePixelRatio,
-      transparent: true,
+      backgroundAlpha: 0,
       antialias: true,
       autoDensity: true,
     });

@@ -21,6 +21,7 @@
   "dependencies": {
     "@pixi-essentials/cull": "^1.1.0",
     "@pixi/app": "^6.5.10",
+    "@pixi/assets": "^6.5.10",
     "@pixi/constants": "^6.5.10",
     "@pixi/core": "^6.5.10",
     "@pixi/display": "^6.5.10",
