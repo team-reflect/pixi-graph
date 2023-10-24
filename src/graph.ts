@@ -129,6 +129,7 @@ export class PixiGraph<NodeAttributes extends BaseNodeAttributes = BaseNodeAttri
     this.resources = options.resources;
     this.nodeDragging = typeof options.nodeDragging === 'boolean' ? options.nodeDragging : true;
     
+    // @ts-expect-error: PIXI is not defined here 
     PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false
 
     if (!(this.container instanceof HTMLElement)) {

@@ -1,21 +1,23 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "es2015",
-    "lib": ["dom", "es2019"],
-    "moduleResolution": "node",
-    "outDir": "dist",
-    "sourceMap": true,
+    "target": "ES2017",
+    "module": "ES2020",
+    "lib": [
+      "dom",
+      "es2019"
+    ],
+    "moduleResolution": "Bundler",
+    "noEmit": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "allowSyntheticDefaultImports": true
   },
   "include": [
+    "./*.ts",
     "src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.test.ts",
     "node_modules"
   ]
 }
