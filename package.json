@@ -10,14 +10,12 @@
   "type": "module",
   "author": "Jan Zak <zj@zakjan.cz>",
   "repository": "github:team-reflect/pixi-graph",
-  "main": "dist/pixi-graph.cjs.js",
-  "module": "dist/pixi-graph.esm.js",
-  "browser": "dist/pixi-graph.umd.min.js",
-  "types": "dist/pixi-graph.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "test": "jest",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
